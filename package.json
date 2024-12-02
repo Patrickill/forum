@@ -12,14 +12,15 @@
     "lint:eslint": "eslint \"{src}/**/*.{ts,tsx}\" --fix"
   },
   "dependencies": {
-    "@chakra-ui/react": "2.8.1",
-    "@emotion/react": "11.11.1",
     "@chakra-ui/anatomy": "2.2.1",
+    "@chakra-ui/react": "2.8.1",
     "@chakra-ui/styled-system": "2.9.1",
+    "@emotion/react": "11.11.1",
     "@emotion/styled": "11.11.0",
     "framer-motion": "9.1.7",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "react-hook-form": "^7.53.2",
     "react-router-dom": "^7.0.1",
     "zustand": "^5.0.1"
   },
