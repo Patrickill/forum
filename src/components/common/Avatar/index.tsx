@@ -1,18 +1,25 @@
-import { Box } from '@chakra-ui/react';
+import { Box, Icon } from '@chakra-ui/react';
 import type { ImageProps } from '@chakra-ui/react';
-
-import MyIcon from '../Icon';
-import { iconPaths } from '../Icon/constants';
 import MyImage from '../MyImage/MyImage';
+import { IconType } from 'react-icons';
+import { FaRegCircleQuestion } from 'react-icons/fa6';
 
-const Avatar = ({ w = '30px', src, ...props }: ImageProps) => {
+const Avatar = ({
+  w = '30px',
+  src,
+  isIcon = false,
+  as = FaRegCircleQuestion,
+  ...props
+}: ImageProps & {
+  isIcon?: boolean;
+  as?: IconType;
+}) => {
   // @ts-ignore
-  const isIcon = !!iconPaths[src as any];
   const LOGO_ICON = '/logo.svg';
 
   return isIcon ? (
     <Box display={'inline-flex'} {...props}>
-      <MyIcon name={src as any} w={w} borderRadius={props.borderRadius} />
+      <Icon as={as} w={w} borderRadius={props.borderRadius} />
     </Box>
   ) : (
     <MyImage

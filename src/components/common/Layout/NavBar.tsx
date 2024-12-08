@@ -1,10 +1,25 @@
 import React, { useMemo } from 'react';
-import { Avatar, Box, BoxProps, Flex, Link, LinkProps, useDisclosure } from '@chakra-ui/react';
-import MyIcon from '@/components/common/Icon';
+import {
+  Avatar,
+  Box,
+  BoxProps,
+  Flex,
+  Icon,
+  Link,
+  LinkProps,
+  useDisclosure,
+} from '@chakra-ui/react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import MyRightDrawer from '../MyDrawer/MyRightDrawer';
 import Message from '@/views/Message';
-
+import {
+  IoMailOutline,
+  IoHomeOutline,
+  IoHome,
+  IoSettingsSharp,
+  IoSettingsOutline,
+} from 'react-icons/io5';
+import { MdOutlineMessage, MdMessage } from 'react-icons/md';
+import { TiUserOutline, TiUser } from 'react-icons/ti';
 const Navbar = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -15,36 +30,36 @@ const Navbar = () => {
     () => [
       {
         label: '广场',
-        icon: 'core/chat/chatLight',
-        activeIcon: 'core/chat/chatFill',
+        icon: IoHomeOutline,
+        activeIcon: IoHome,
         link: '/home',
         activeLink: ['/home'],
       },
       {
         label: '快讯',
-        icon: 'core/app/aiLight',
-        activeIcon: 'core/app/aiFill',
+        icon: MdOutlineMessage,
+        activeIcon: MdMessage,
         link: `/alerts`,
         activeLink: ['/alerts'],
       },
       {
         label: '消息',
-        icon: 'core/dataset/datasetLight',
-        activeIcon: 'core/dataset/datasetFill',
+        icon: IoMailOutline,
+        activeIcon: IoMailOutline,
         link: `/message`,
         activeLink: ['/message'],
       },
       {
         label: '我的',
-        icon: 'support/user/userLight',
-        activeIcon: 'support/user/userFill',
+        icon: TiUserOutline,
+        activeIcon: TiUser,
         link: '/me',
         activeLink: ['/me'],
       },
       {
         label: '设置',
-        icon: 'support/user/userLight',
-        activeIcon: 'support/user/userFill',
+        icon: IoSettingsOutline,
+        activeIcon: IoSettingsSharp,
         link: '/setting',
         activeLink: ['/setting'],
       },
@@ -115,8 +130,8 @@ const Navbar = () => {
                   }
                 : {})}
             >
-              <MyIcon
-                name={
+              <Icon
+                as={
                   item.activeLink.includes(location.pathname)
                     ? (item.activeIcon as any)
                     : (item.icon as any)

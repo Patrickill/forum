@@ -1,5 +1,4 @@
 import React from 'react';
-import MyIcon from '../Icon';
 import {
   Drawer,
   DrawerBody,

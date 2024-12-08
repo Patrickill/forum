@@ -1,7 +1,26 @@
 import { Box, Flex } from '@chakra-ui/react';
 import LoginForm from './components/LoginForm';
+import { useState } from 'react';
+import RegisterForm from './components/RegisterForm';
+
+export enum LoginPageTypeEnum {
+  passwordLogin = 'passwordLogin',
+  register = 'register',
+}
 
 const Login = () => {
+  const [pageType, setPageType] = useState<`${LoginPageTypeEnum}`>();
+
+  function DynamicComponent({ type }: { type: `${LoginPageTypeEnum}` }) {
+    const TypeMap = {
+      [LoginPageTypeEnum.passwordLogin]: LoginForm,
+      [LoginPageTypeEnum.register]: RegisterForm,
+    };
+
+    const Component = TypeMap[type];
+
+    return <Component setPageType={setPageType} />;
+  }
   return (
     <>
       <Flex
@@ -27,7 +46,7 @@ const Login = () => {
           ]}
         >
           <Box w={['100%', '380px']} flex={'1 0 0'}>
-            <LoginForm />
+            <DynamicComponent type={pageType || LoginPageTypeEnum.passwordLogin} />
           </Box>
         </Flex>
       </Flex>

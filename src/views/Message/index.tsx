@@ -22,7 +22,7 @@ const Message = ({
       <DrawerOverlay />
       <DrawerContent>
         <DrawerHeader borderBottomWidth="1px">{title}</DrawerHeader>
-        <DrawerBody>
+        <DrawerBody overflow={'overlay'} overflowX={'hidden'}>
           <p>Some contents...</p>
           <p>Some contents...</p>
           <p>Some contents...</p>

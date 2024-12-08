@@ -15,7 +15,7 @@ import {
 import React, { useRef } from 'react';
 import { FaCheck } from 'react-icons/fa';
 import MyTag from '../Tag/index';
-import MyIcon from '../Icon';
+import TagCard from '@/components/core/tag/TagCard';
 
 export type SelectProps<T = any> = {
   value: T[];
@@ -42,15 +42,8 @@ const MultipleSelect = <T = any,>({
   const { isOpen, onOpen, onClose } = useDisclosure();
   const menuItemStyles: MenuItemProps = {
     borderRadius: 'sm',
-    py: 2,
     display: 'flex',
     alignItems: 'center',
-    _hover: {
-      backgroundColor: 'myGray.100',
-    },
-    _notLast: {
-      mb: 2,
-    },
   };
 
   const onclickItem = (val: T) => {
@@ -126,50 +119,44 @@ const MultipleSelect = <T = any,>({
           )}
         </MenuButton>
 
-        <MenuList
-          className={props.className}
-          minW={(() => {
-            const w = ref.current?.clientWidth;
-            if (w) {
-              return `${w}px !important`;
+        <MenuList py={0}>
+          <Flex
+            className={props.className}
+            minW={(() => {
+              const w = ref.current?.clientWidth;
+              if (w) {
+                return `${w}px !important`;
+              }
+              return Array.isArray(width)
+                ? width.map((item) => `${item} !important`)
+                : `${width} !important`;
+            })()}
+            w={'auto'}
+            p={4}
+            border={'1px solid #fff'}
+            boxShadow={
+              '0px 2px 4px rgba(161, 167, 179, 0.25), 0px 0px 1px rgba(121, 141, 159, 0.25);'
             }
-            return Array.isArray(width)
-              ? width.map((item) => `${item} !important`)
-              : `${width} !important`;
-          })()}
-          w={'auto'}
-          px={'6px'}
-          py={'6px'}
-          border={'1px solid #fff'}
-          boxShadow={
-            '0px 2px 4px rgba(161, 167, 179, 0.25), 0px 0px 1px rgba(121, 141, 159, 0.25);'
-          }
-          zIndex={99}
-          maxH={'40vh'}
-          overflowY={'auto'}
-        >
-          {list.map((item, i) => (
-            <MenuItem
-              key={i}
-              {...menuItemStyles}
-              {...(value.includes(item.value)
-                ? {
-                    color: 'primary.600',
-                  }
-                : {
-                    color: 'myGray.900',
-                  })}
-              onClick={() => onclickItem(item.value)}
-              whiteSpace={'pre-wrap'}
-              fontSize={'sm'}
-              gap={2}
-            >
-              <Box w={'0.8rem'} lineHeight={1}>
-                {value.includes(item.value) && <Icon as={FaCheck} w={'1rem'} />}
+            zIndex={99}
+            maxH={'40vh'}
+            overflowY={'auto'}
+            gap={2}
+            flexWrap={'wrap'}
+          >
+            {list.map((item, i) => (
+              <Box
+                key={i}
+                {...menuItemStyles}
+                onClick={() => onclickItem(item.value)}
+                whiteSpace={'pre-wrap'}
+                fontSize={'sm'}
+              >
+                {typeof item.label === 'string' && (
+                  <TagCard tag={item.label} selected={value.includes(item.value)} />
+                )}
               </Box>
-              <Box>{item.label}</Box>
-            </MenuItem>
-          ))}
+            ))}
+          </Flex>
         </MenuList>
       </Menu>
     </Box>

@@ -6,9 +6,10 @@ import { useToast } from '@/hooks/useToast';
 import { useNavigate } from 'react-router-dom';
 import { LoginPageTypeEnum } from '..';
 
-type LoginFormType = {
+type RegisterFormType = {
   username: string;
   password: string;
+  password2: string;
 };
 
 const LoginForm = ({ setPageType }: { setPageType: (type: `${LoginPageTypeEnum}`) => void }) => {
@@ -16,14 +17,14 @@ const LoginForm = ({ setPageType }: { setPageType: (type: `${LoginPageTypeEnum}`
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<LoginFormType>();
+  } = useForm<RegisterFormType>();
 
   const { toast } = useToast();
   const [requesting, setRequesting] = useState(false);
   const navigate = useNavigate();
 
   const onclickLogin = useCallback(
-    async ({ username, password }: LoginFormType) => {
+    async ({ username, password }: RegisterFormType) => {
       setRequesting(true);
       console.log(username, password);
       try {
@@ -105,6 +106,22 @@ const LoginForm = ({ setPageType }: { setPageType: (type: `${LoginPageTypeEnum}`
             })}
           ></Input>
         </FormControl>
+        <FormControl mt={7} isInvalid={!!errors.password2}>
+          <Input
+            bg={'myGray.50'}
+            size={'lg'}
+            fontSize={'sm'}
+            type={'password'}
+            placeholder={'请再次输入密码'}
+            {...register('password', {
+              required: true,
+              maxLength: {
+                value: 60,
+                message: '密码不能超过60个字符',
+              },
+            })}
+          ></Input>
+        </FormControl>
         <Button
           type="submit"
           my={5}
@@ -115,7 +132,7 @@ const LoginForm = ({ setPageType }: { setPageType: (type: `${LoginPageTypeEnum}`
           isLoading={requesting}
           onClick={handleSubmit(onclickLogin)}
         >
-          {'登录'}
+          {'注册'}
         </Button>
         <Box
           float={'right'}
@@ -126,9 +143,9 @@ const LoginForm = ({ setPageType }: { setPageType: (type: `${LoginPageTypeEnum}`
           color={'primary.700'}
           cursor={'pointer'}
           _hover={{ textDecoration: 'underline' }}
-          onClick={() => setPageType(LoginPageTypeEnum.register)}
+          onClick={() => setPageType(LoginPageTypeEnum.passwordLogin)}
         >
-          {'去注册'}
+          {'去登陆'}
         </Box>
       </Box>
     </Flex>

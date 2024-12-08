@@ -4,6 +4,8 @@ import Login from '@/views/Login';
 import Setting from '@/views/Setting';
 import Alerts from '@/views/Alerts';
 import Me from '@/views/Me';
+import Editor from '@/views/Edit';
+import Post from '@/views/Post';
 
 /**
  * 公共路由
@@ -38,6 +40,16 @@ export const constantRoutes: RouteObject[] = [
     path: '/me',
     id: 'Me',
     element: <Me />,
+  },
+  {
+    path: '/edit',
+    id: 'edit',
+    element: <Editor />,
+  },
+  {
+    path: '/post',
+    id: 'post',
+    element: <Post />,
   },
 ];
 
