@@ -4,6 +4,7 @@ import {
   ButtonProps,
   Flex,
   Icon,
+  Input,
   Menu,
   MenuButton,
   MenuItem,
@@ -27,6 +28,7 @@ export type SelectProps<T = any> = {
   }[];
   maxH?: number;
   onSelect: (val: T[]) => void;
+  header: React.ReactNode;
 } & Omit<ButtonProps, 'onSelect'>;
 
 const MultipleSelect = <T = any,>({
@@ -36,6 +38,7 @@ const MultipleSelect = <T = any,>({
   width = '100%',
   maxH = 400,
   onSelect,
+  header,
   ...props
 }: SelectProps<T>) => {
   const ref = useRef<HTMLButtonElement>(null);
@@ -101,17 +104,6 @@ const MultipleSelect = <T = any,>({
                 return (
                   <MyTag key={i} colorSchema="blue" type={'borderFill'}>
                     {listItem.label}
-                    {/* <MyIcon
-                      name={'common/closeLight'}
-                      ml={1}
-                      w="14px"
-                      cursor={'pointer'}
-                      onClickCapture={(e) => {
-                        console.log(111);
-                        e.stopPropagation();
-                        onclickItem(item);
-                      }}
-                    /> */}
                   </MyTag>
                 );
               })}
@@ -120,6 +112,7 @@ const MultipleSelect = <T = any,>({
         </MenuButton>
 
         <MenuList py={0}>
+          {header}
           <Flex
             className={props.className}
             minW={(() => {

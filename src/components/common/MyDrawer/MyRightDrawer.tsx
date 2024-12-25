@@ -12,7 +12,7 @@ import {
   Box,
 } from '@chakra-ui/react';
 import Avatar from '../Avatar';
-import { useLoading } from '../../../hooks/useLoading';
+import { useLoading } from '../../../hooks/support/useLoading';
 
 type Props = DrawerContentProps & {
   onClose: () => void;

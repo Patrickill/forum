@@ -20,7 +20,7 @@ import {
 } from '@chakra-ui/react';
 import type { ButtonProps, MenuItemProps } from '@chakra-ui/react';
 import { ChevronDownIcon } from '@chakra-ui/icons';
-import { useRequest2 } from '../../../hooks/useRequest';
+import { useRequest2 } from '@/hooks/core/useRequest';
 import { TbLoader2 } from 'react-icons/tb';
 
 export type SelectProps<T = any> = ButtonProps & {

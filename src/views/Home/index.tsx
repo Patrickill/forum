@@ -1,12 +1,21 @@
 import { Box, Button, Flex, Icon } from '@chakra-ui/react';
 import PageContainer from '@/components/common/Layout/PageContainer';
 import LightRowTabs from '@/components/common/Tabs/LightRowTabs';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import MyDivider from '@/components/common/MyDivider';
 import { BiChevronRight } from 'react-icons/bi';
-import useRoute from '@/hooks/useRouter';
+import useRoute from '@/hooks/support/useRouter';
 import SidePostCard from './components/SidePostCard';
 import TagCard from '@/components/core/tag/TagCard';
+import HotTagList from '@/components/core/tag/HotTagList';
+import TopicTab from './components/TopicTab';
+import { useRequest2 } from '@/hooks/core/useRequest';
+import { getPostListByTopic } from '@/api/core/post';
+import { usePagination } from '@/hooks/support/usePagination';
+import MyBox from '@/components/common/MyBox';
+import PostCard from '@/components/core/post/PostCard';
+import { postListType } from '@/types/core/post';
+import HotPostList from '@/components/core/post/HotPostList';
 enum TabEnum {
   hot = 'hot',
   new = 'new',
@@ -14,17 +23,32 @@ enum TabEnum {
 
 const Home = () => {
   const [currentTab, setCurrentTab] = useState(TabEnum.hot);
-
+  const [currentTopic, setCurrentTopic] = useState('');
   const { push } = useRoute();
+  const ScrollContainerRef = useRef<HTMLDivElement>(null);
 
-  const testTag = ['1111', '22222', '33333', '444442222', '222222222222sadsad'];
+  const {
+    data: postList,
+    isLoading,
+    ScrollData,
+    total,
+  } = usePagination<postListType>({
+    api: getPostListByTopic,
+    params: { categoryId: currentTopic },
+    pageSize: 10,
+    defaultRequest: true,
+    refreshDeps: [currentTopic],
+  });
 
   return (
     <PageContainer>
-      <Flex w={'100%'} h={'100%'} p={6}>
+      <Flex w={'100%'} h={'100%'} p={6} ref={ScrollContainerRef} overflow={'overlay'} gap={6}>
         <Box flex={5}>
-          <Box w={'100%'} h={'200px'} bg={'myGray.100'}>
-            {'我是背景图'}
+          <Flex justify={'center'} w={'100%'} p={1}>
+            <TopicTab value={currentTopic} setValue={setCurrentTopic} />
+          </Flex>
+          <Box>
+            <MyDivider color={'myGray.300'} />
           </Box>
           <LightRowTabs<TabEnum>
             list={[
@@ -42,8 +66,14 @@ const Home = () => {
             px={4}
             width={'200px'}
           />
+
+          <MyBox isLoading={isLoading} pt={4}>
+            <ScrollData ScrollContainerRef={ScrollContainerRef}>
+              {postList?.map((item) => <PostCard {...item} />)}
+            </ScrollData>
+          </MyBox>
         </Box>
-        <Box flex={1} h={'100%'} p={4}>
+        <Box flex={1} h={'100%'} pl={4}>
           <Box w={'100%'} p={4}>
             <Button w={'300px'} borderRadius={20}>
               <Flex>
@@ -52,47 +82,8 @@ const Home = () => {
               </Flex>
             </Button>
           </Box>
-          <Box>
-            <Box fontWeight={'600'} fontSize={'xl'} color={'myGray.900'}>
-              {'本周热门帖子'}
-            </Box>
-            <MyDivider px={2} />
-            <SidePostCard
-              title={'测试标题测试标题测试标题测试标题测试标题测试标题2222'}
-              view={100}
-            />
-            <SidePostCard
-              title={'测试标题测试标题测试标题测试标题测试标题测试标题2222'}
-              view={100}
-            />
-            <SidePostCard
-              title={'测试标题测试标题测试标题测试标题测试标题测试标题2222'}
-              view={100}
-            />
-            <SidePostCard
-              title={'测试标题测试标题测试标题测试标题测试标题测试标题2222'}
-              view={100}
-            />
-            <SidePostCard
-              title={'测试标题测试标题测试标题测试标题测试标题测试标题2222'}
-              view={100}
-            />
-            <SidePostCard
-              title={'测试标题测试标题测试标题测试标题测试标题测试标题2222'}
-              view={100}
-            />
-          </Box>
-          <Box>
-            <Box fontWeight={'600'} fontSize={'xl'} color={'myGray.900'}>
-              {'本周热门标签'}
-            </Box>
-            <MyDivider px={2} />
-            <Flex flexWrap={'wrap'} gap={2}>
-              {testTag.map((item) => (
-                <TagCard key={item} tag={item} />
-              ))}
-            </Flex>
-          </Box>
+          <HotPostList />
+          <HotTagList />
         </Box>
       </Flex>
     </PageContainer>

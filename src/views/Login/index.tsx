@@ -1,7 +1,12 @@
 import { Box, Flex } from '@chakra-ui/react';
 import LoginForm from './components/LoginForm';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import RegisterForm from './components/RegisterForm';
+import { ResLogin } from '@/api/support/login';
+import useRoute from '@/hooks/support/useRouter';
+import { useRequest2 } from '@/hooks/core/useRequest';
+import { getUserInfo } from '@/api/support/user';
+import { useUserStore } from '@/store/support/useUserStore';
 
 export enum LoginPageTypeEnum {
   passwordLogin = 'passwordLogin',
@@ -10,6 +15,18 @@ export enum LoginPageTypeEnum {
 
 const Login = () => {
   const [pageType, setPageType] = useState<`${LoginPageTypeEnum}`>();
+  const { push } = useRoute();
+  const { setUserInfo } = useUserStore();
+
+  const { runAsync: initUserInfo } = useRequest2(getUserInfo, {
+    onSuccess: (res) => {
+      console.log('res', res);
+      setUserInfo(res);
+    },
+    onFinally: () => {
+      console.log('finally');
+    },
+  });
 
   function DynamicComponent({ type }: { type: `${LoginPageTypeEnum}` }) {
     const TypeMap = {
@@ -17,9 +34,17 @@ const Login = () => {
       [LoginPageTypeEnum.register]: RegisterForm,
     };
 
+    const loginSuccess = useCallback(async (res: ResLogin) => {
+      //本地存储token和用户信息
+      await initUserInfo();
+      setTimeout(() => {
+        push('/home');
+      }, 300);
+    }, []);
+
     const Component = TypeMap[type];
 
-    return <Component setPageType={setPageType} />;
+    return <Component setPageType={setPageType} loginSuccess={loginSuccess} />;
   }
   return (
     <>

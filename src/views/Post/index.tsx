@@ -1,85 +1,74 @@
 import MyIcon from '@/components/common/MyIcon';
-import { Box, Flex } from '@chakra-ui/react';
+import { Avatar, Box, Flex } from '@chakra-ui/react';
 import SliderList from './components/SliserList';
 import MDEditor from '@uiw/react-md-editor';
-import SidePostCard from '../Home/components/SidePostCard';
-import MyDivider from '@/components/common/MyDivider';
-import MyTextArea from '@/components/core/post/TextArea';
 import { useRef } from 'react';
+import Header from '@/components/common/Layout/Header';
+import { useRequest2 } from '@/hooks/core/useRequest';
+import { getPostById } from '@/api/core/post';
+import useRoute from '@/hooks/support/useRouter';
+import MyBox from '@/components/common/MyBox';
+import HotPostList from '@/components/core/post/HotPostList';
+import { calculateReadingTime, formatTimeToChatTime } from '@/utils/time';
+import HotTagList, { TagList } from '@/components/core/tag/HotTagList';
+import Comment from './components/Comment';
 
 const Post = () => {
-  const testPost =
-    '# 1111 \n nihaonihaonihaonihaonihaonihaonihaonihaonihaonihaonihaonihaonihaonihaonihaonihaonihaonihaonihaonihaonihaonihaonihaonihaonihaonihaonihao';
   const TextareaDom = useRef<HTMLTextAreaElement>(null);
 
-  return (
-    <Box bg={'myGray.50'} w={'100%'} h={'100%'} overflow={'overlay'}>
-      <SliderList pos={'fixed'} top={20} left={10} h={'300px'} w={'80px'} />
+  const { getQueryParam } = useRoute();
 
-      <Flex minH={'100%'} mt={'80px'} ml={'12%'} gap={10}>
+  const { data: post, loading } = useRequest2(
+    () => getPostById({ postId: getQueryParam('postId') || '' }),
+    {
+      manual: false,
+    }
+  );
+
+  return (
+    <MyBox bg={'myGray.50'} w={'100%'} h={'100%'} overflow={'overlay'} isLoading={loading}>
+      <Header />
+      <SliderList pos={'fixed'} top={'130px'} left={10} h={'300px'} w={'80px'} />
+
+      <Flex minH={`calc(100vh - 100px)`} mt={'100px'} ml={'10%'} gap={10}>
         <Flex flexDir={'column'} w={'70%'} gap={6}>
           {/* 文章 */}
           <Flex flexDir={'column'} w={'100%'} bg={'white'} p={6}>
             <Box fontSize={'3xl'} color={'myGray.900'} fontWeight={'bold'}>
-              {'测试标题测试标题测试标题测试标题测试标题测试标题'}
+              {post?.title}
             </Box>
-            <Flex alignItems={'center'} gap={2} mt={4} mb={10}>
-              <Box>{'作者'}</Box>
-              <Box>{'时间'}</Box>
-              <Box>{'浏览量'}</Box>
-              <Box>{'标签list'}</Box>
+            <Flex alignItems={'center'} gap={6} my={4} color={'myGray.400'}>
+              <Box color={'myGray.500'}>{post?.user.nickname}</Box>
+              <Box>{formatTimeToChatTime(new Date(post?.createdOn || ''))}</Box>
+              <Flex gap={1} align={'center'} justify={'center'}>
+                <MyIcon name="view" /> {post?.viewCount}
+              </Flex>
+              <Flex gap={1} align={'center'} justify={'center'}>
+                <MyIcon name="clock" /> {`阅读 ${calculateReadingTime(post?.content || '')} 分钟`}
+              </Flex>
             </Flex>
-            <MDEditor.Markdown source={testPost} style={{ whiteSpace: 'pre-wrap' }} />
+            <Box mb={10}>
+              <TagList tagList={post?.tags || []} />
+            </Box>
+            <MDEditor.Markdown source={post?.content} style={{ whiteSpace: 'pre-wrap' }} />
           </Flex>
 
           {/* 评论区 */}
-          <Flex flexDir={'column'} w={'100%'} bg={'white'} p={6}>
-            <Box fontSize={'lg'} fontWeight={'bold'} color={'myGray.900'}>
-              {'评论 58'}
-            </Box>
-
-            <MyTextArea TextareaDom={TextareaDom} />
-          </Flex>
+          {post && <Comment postId={post?.id} />}
         </Flex>
 
         {/* 侧边栏 */}
-        <Flex flexDir={'column'} gap={6}>
-          <Box p={6} bg={'white'}>
-            {'头像'}
-          </Box>
+        <Flex flexDir={'column'} gap={6} w={'25%'}>
+          <Flex p={6} bg={'white'} flexDir={'column'} justify={'center'} align={'center'} gap={2}>
+            <Avatar src={post?.user.avatar || ''} />
+            <Box fontSize={'lg'}>{post?.user.nickname}</Box>
+          </Flex>
           <Box bg={'white'} p={6}>
-            <Box fontWeight={'600'} fontSize={'xl'} color={'myGray.900'}>
-              {'本周热门帖子'}
-            </Box>
-            <MyDivider px={2} />
-            <SidePostCard
-              title={'测试标题测试标题测试标题测试标题测试标题测试标题2222'}
-              view={100}
-            />
-            <SidePostCard
-              title={'测试标题测试标题测试标题测试标题测试标题测试标题2222'}
-              view={100}
-            />
-            <SidePostCard
-              title={'测试标题测试标题测试标题测试标题测试标题测试标题2222'}
-              view={100}
-            />
-            <SidePostCard
-              title={'测试标题测试标题测试标题测试标题测试标题测试标题2222'}
-              view={100}
-            />
-            <SidePostCard
-              title={'测试标题测试标题测试标题测试标题测试标题测试标题2222'}
-              view={100}
-            />
-            <SidePostCard
-              title={'测试标题测试标题测试标题测试标题测试标题测试标题2222'}
-              view={100}
-            />
+            <HotPostList />
           </Box>
         </Flex>
       </Flex>
-    </Box>
+    </MyBox>
   );
 };
 

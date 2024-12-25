@@ -2,16 +2,23 @@ import { Box, Button, Flex, FormControl, Image, Input } from '@chakra-ui/react';
 import { SYSTEM_TITLE } from '@/constants/system';
 import { useForm } from 'react-hook-form';
 import { useCallback, useState } from 'react';
-import { useToast } from '@/hooks/useToast';
+import { useToast } from '@/hooks/support/useToast';
 import { useNavigate } from 'react-router-dom';
 import { LoginPageTypeEnum } from '..';
+import { Login, ResLogin } from '@/api/support/login';
 
 type LoginFormType = {
   username: string;
   password: string;
 };
 
-const LoginForm = ({ setPageType }: { setPageType: (type: `${LoginPageTypeEnum}`) => void }) => {
+const LoginForm = ({
+  setPageType,
+  loginSuccess,
+}: {
+  setPageType: (type: `${LoginPageTypeEnum}`) => void;
+  loginSuccess: (e: ResLogin) => Promise<void>;
+}) => {
   const {
     register,
     handleSubmit,
@@ -25,19 +32,19 @@ const LoginForm = ({ setPageType }: { setPageType: (type: `${LoginPageTypeEnum}`
   const onclickLogin = useCallback(
     async ({ username, password }: LoginFormType) => {
       setRequesting(true);
-      console.log(username, password);
+
       try {
-        // loginSuccess(
-        //   await postLogin({
-        //     username,
-        //     password,
-        //   })
-        // );
+        await loginSuccess(
+          await Login({
+            username,
+            password,
+          })
+        );
         toast({
           title: '登陆成功',
           status: 'success',
         });
-        navigate('/');
+        navigate('/home');
       } catch (error: any) {
         toast({
           title: error.message || '登陆失败',

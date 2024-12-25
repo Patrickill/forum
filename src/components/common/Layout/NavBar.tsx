@@ -20,11 +20,16 @@ import {
 } from 'react-icons/io5';
 import { MdOutlineMessage, MdMessage } from 'react-icons/md';
 import { TiUserOutline, TiUser } from 'react-icons/ti';
+import { CiLogout } from 'react-icons/ci';
+import { useUserStore } from '@/store/support/useUserStore';
+
 const Navbar = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
   const { isOpen, onOpen, onClose } = useDisclosure();
+
+  const { userInfo } = useUserStore();
 
   const navbarList = useMemo(
     () => [
@@ -63,6 +68,12 @@ const Navbar = () => {
         link: '/setting',
         activeLink: ['/setting'],
       },
+      {
+        label: '退出',
+        icon: CiLogout,
+        link: '/logout',
+        activeLink: ['/logout'],
+      },
     ],
     []
   );
@@ -93,13 +104,12 @@ const Navbar = () => {
         <Box
           flex={'0 0 auto'}
           mb={3}
-          border={'2px solid #fff'}
           borderRadius={'50%'}
           overflow={'hidden'}
           cursor={'pointer'}
-          onClick={() => navigate('/account')}
+          onClick={() => navigate('/me')}
         >
-          <Avatar w={'36px'} h={'36px'} src={'/logo.svg'} borderRadius={'50%'} />
+          <Avatar w={'36px'} h={'36px'} src={userInfo?.avatar} borderRadius={'50%'} />
         </Box>
         {/* 导航列表 */}
         <Box flex={1}>
@@ -124,6 +134,10 @@ const Navbar = () => {
               {...(item.link !== location.pathname
                 ? {
                     onClick: () => {
+                      if (item.link === '/logout') {
+                        navigate('/login');
+                        return;
+                      }
                       if (item.link === '/message') onOpen();
                       else navigate(item.link);
                     },

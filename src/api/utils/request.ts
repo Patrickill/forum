@@ -85,7 +85,7 @@ function checkRes(data: ResponseDataType) {
   if (data === undefined) {
     console.log('error->', data, 'data is empty');
     return Promise.reject('服务器异常');
-  } else if (data.code < 200 || data.code >= 400) {
+  } else if (data.code !== 0) {
     return Promise.reject(data);
   }
   return data.data;
@@ -137,10 +137,10 @@ function request(
   }
 
   const controller = checkMaxQuantity({ url, maxQuantity });
-
+  const baseUrl = '';
   return instance
     .request({
-      baseURL: getWebReqUrl('/api'),
+      baseURL: baseUrl,
       url,
       method,
       data: ['POST', 'PUT'].includes(method) ? data : undefined,

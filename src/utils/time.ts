@@ -63,3 +63,10 @@ export const formatTimeToChatItemTime = (time: Date) => {
   // 如果是更久之前，展示某年某月某日+几时:几分
   return target.format('YYYY-M-D') + ' ' + detailTime;
 };
+
+export const calculateReadingTime = (text: string) => {
+  const wordsPerMinute = 250; // 假设的阅读速度
+  const words = text.split(/\s+/).filter(Boolean).length; // 分词，并过滤掉空字符串
+  const minutes = Math.ceil(words / wordsPerMinute); // 计算分钟
+  return minutes;
+};

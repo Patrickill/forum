@@ -2,20 +2,31 @@ import { Box, Button, Flex, FormControl, Image, Input } from '@chakra-ui/react';
 import { SYSTEM_TITLE } from '@/constants/system';
 import { useForm } from 'react-hook-form';
 import { useCallback, useState } from 'react';
-import { useToast } from '@/hooks/useToast';
+import { useToast } from '@/hooks/support/useToast';
 import { useNavigate } from 'react-router-dom';
 import { LoginPageTypeEnum } from '..';
+import { Login, Register, ResLogin } from '@/api/support/login';
 
-type RegisterFormType = {
+export type RegisterFormType = {
   username: string;
   password: string;
-  password2: string;
+  password2?: string;
+  nickname: string;
+  email: string;
+  phone: string;
 };
 
-const LoginForm = ({ setPageType }: { setPageType: (type: `${LoginPageTypeEnum}`) => void }) => {
+const RegisterForm = ({
+  setPageType,
+  loginSuccess,
+}: {
+  setPageType: (type: `${LoginPageTypeEnum}`) => void;
+  loginSuccess: (e: ResLogin) => Promise<void>;
+}) => {
   const {
     register,
     handleSubmit,
+    getValues,
     formState: { errors },
   } = useForm<RegisterFormType>();
 
@@ -24,24 +35,19 @@ const LoginForm = ({ setPageType }: { setPageType: (type: `${LoginPageTypeEnum}`
   const navigate = useNavigate();
 
   const onclickLogin = useCallback(
-    async ({ username, password }: RegisterFormType) => {
+    async (data: RegisterFormType) => {
       setRequesting(true);
-      console.log(username, password);
+
       try {
-        // loginSuccess(
-        //   await postLogin({
-        //     username,
-        //     password,
-        //   })
-        // );
+        await Register(data);
         toast({
-          title: '登陆成功',
+          title: '注册成功',
           status: 'success',
         });
-        navigate('/');
+        setPageType(LoginPageTypeEnum.passwordLogin);
       } catch (error: any) {
         toast({
-          title: error.message || '登陆失败',
+          title: error.message || '注册失败',
           status: 'error',
         });
       }
@@ -90,6 +96,43 @@ const LoginForm = ({ setPageType }: { setPageType: (type: `${LoginPageTypeEnum}`
             })}
           ></Input>
         </FormControl>
+
+        <FormControl mt={7} isInvalid={!!errors.nickname}>
+          <Input
+            bg={'myGray.50'}
+            size={'lg'}
+            fontSize={'sm'}
+            placeholder={'昵称'}
+            {...register('nickname', {
+              required: true,
+            })}
+          ></Input>
+        </FormControl>
+
+        <FormControl mt={7} isInvalid={!!errors.email}>
+          <Input
+            bg={'myGray.50'}
+            size={'lg'}
+            fontSize={'sm'}
+            placeholder={'邮箱'}
+            {...register('email', {
+              required: true,
+            })}
+          ></Input>
+        </FormControl>
+
+        <FormControl mt={7} isInvalid={!!errors.phone}>
+          <Input
+            bg={'myGray.50'}
+            size={'lg'}
+            fontSize={'sm'}
+            placeholder={'手机号'}
+            {...register('phone', {
+              required: true,
+            })}
+          ></Input>
+        </FormControl>
+
         <FormControl mt={7} isInvalid={!!errors.password}>
           <Input
             bg={'myGray.50'}
@@ -113,12 +156,8 @@ const LoginForm = ({ setPageType }: { setPageType: (type: `${LoginPageTypeEnum}`
             fontSize={'sm'}
             type={'password'}
             placeholder={'请再次输入密码'}
-            {...register('password', {
-              required: true,
-              maxLength: {
-                value: 60,
-                message: '密码不能超过60个字符',
-              },
+            {...register('password2', {
+              validate: (val) => (getValues('password') === val ? true : '两次密码不匹配'),
             })}
           ></Input>
         </FormControl>
@@ -152,4 +191,4 @@ const LoginForm = ({ setPageType }: { setPageType: (type: `${LoginPageTypeEnum}`
   );
 };
 
-export default LoginForm;
+export default RegisterForm;
