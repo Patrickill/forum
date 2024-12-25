@@ -1,6 +1,7 @@
 import { PaginationProps, PagingData, RequestPaging } from '@/types/support/request';
 import { GET, POST } from '../utils/request';
 import { createPostType, postDetailType, postListType, TagType } from '@/types/core/post';
+import { data } from 'react-router-dom';
 
 export const createPost = (data: createPostType) => POST('/api/post/add', data);
 
@@ -29,3 +30,6 @@ export const collectPost = (data: { postId: string }) => POST('/api/post/collect
 export const CancelStarPost = (data: { postId: string }) => POST('/api/post/star/del', data);
 
 export const CancelCollectPost = (data: { postId: string }) => POST('/api/post/collect/del', data);
+
+export const searchPost = (data: { q: string } & RequestPaging) =>
+  GET<PagingData<postListType>>('/api/search/post', data);

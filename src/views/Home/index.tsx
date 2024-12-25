@@ -16,6 +16,7 @@ import MyBox from '@/components/common/MyBox';
 import PostCard from '@/components/core/post/PostCard';
 import { postListType } from '@/types/core/post';
 import HotPostList from '@/components/core/post/HotPostList';
+import { getTopicList } from '@/api/core/topic';
 enum TabEnum {
   hot = 'hot',
   new = 'new',
@@ -23,9 +24,17 @@ enum TabEnum {
 
 const Home = () => {
   const [currentTab, setCurrentTab] = useState(TabEnum.hot);
-  const [currentTopic, setCurrentTopic] = useState('');
+
   const { push } = useRoute();
   const ScrollContainerRef = useRef<HTMLDivElement>(null);
+
+  const { data: topicList, loading } = useRequest2(getTopicList, {
+    manual: false,
+    onSuccess: (res) => {
+      setCurrentTopic(res[0]?.id || 0);
+    },
+  });
+  const [currentTopic, setCurrentTopic] = useState(0);
 
   const {
     data: postList,
@@ -45,7 +54,7 @@ const Home = () => {
       <Flex w={'100%'} h={'100%'} p={6} ref={ScrollContainerRef} overflow={'overlay'} gap={6}>
         <Box flex={5}>
           <Flex justify={'center'} w={'100%'} p={1}>
-            <TopicTab value={currentTopic} setValue={setCurrentTopic} />
+            <TopicTab topicList={topicList || []} value={currentTopic} setValue={setCurrentTopic} />
           </Flex>
           <Box>
             <MyDivider color={'myGray.300'} />
@@ -82,7 +91,7 @@ const Home = () => {
               </Flex>
             </Button>
           </Box>
-          <HotPostList />
+          {/* <HotPostList /> */}
           <HotTagList />
         </Box>
       </Flex>

@@ -14,9 +14,14 @@ import HotTagList, { TagList } from '@/components/core/tag/HotTagList';
 import Comment from './components/Comment';
 
 const Post = () => {
-  const TextareaDom = useRef<HTMLTextAreaElement>(null);
-
   const { getQueryParam } = useRoute();
+
+  const commentRef = useRef<HTMLDivElement>(null);
+  const scrollToComment = () => {
+    if (commentRef.current) {
+      commentRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
 
   const { data: post, loading } = useRequest2(
     () => getPostById({ postId: getQueryParam('postId') || '' }),
@@ -28,7 +33,19 @@ const Post = () => {
   return (
     <MyBox bg={'myGray.50'} w={'100%'} h={'100%'} overflow={'overlay'} isLoading={loading}>
       <Header />
-      <SliderList pos={'fixed'} top={'130px'} left={10} h={'300px'} w={'80px'} />
+      <SliderList
+        pos={'fixed'}
+        top={'130px'}
+        left={10}
+        h={'300px'}
+        w={'80px'}
+        upvoteCount={post?.upvoteCount || 0}
+        collectionCount={post?.collectionCount || 0}
+        commentCount={post?.commentCount || 0}
+        isCollect={post?.isCollect || false}
+        isUpvote={post?.isUpvote || false}
+        scrollToComment={scrollToComment}
+      />
 
       <Flex minH={`calc(100vh - 100px)`} mt={'100px'} ml={'10%'} gap={10}>
         <Flex flexDir={'column'} w={'70%'} gap={6}>
@@ -50,11 +67,12 @@ const Post = () => {
             <Box mb={10}>
               <TagList tagList={post?.tags || []} />
             </Box>
+
             <MDEditor.Markdown source={post?.content} style={{ whiteSpace: 'pre-wrap' }} />
           </Flex>
 
           {/* 评论区 */}
-          {post && <Comment postId={post?.id} />}
+          <Box ref={commentRef}>{post && <Comment postId={post?.id} />}</Box>
         </Flex>
 
         {/* 侧边栏 */}
@@ -64,7 +82,7 @@ const Post = () => {
             <Box fontSize={'lg'}>{post?.user.nickname}</Box>
           </Flex>
           <Box bg={'white'} p={6}>
-            <HotPostList />
+            {/* <HotPostList /> */}
           </Box>
         </Flex>
       </Flex>

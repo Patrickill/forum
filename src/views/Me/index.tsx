@@ -28,7 +28,7 @@ export interface UserUpdateParams {
 }
 
 const Me = () => {
-  const { userInfo } = useUserStore();
+  const { userInfo, setUserInfo } = useUserStore();
   const { toast } = useToast();
   console.log('userInfo', userInfo);
 
@@ -45,9 +45,11 @@ const Me = () => {
     color: 'myGray.900',
   };
 
-  const { reset } = useForm<UserUpdateParams>({
+  const { reset, watch } = useForm<UserUpdateParams>({
     defaultValues: userInfo as UserType,
   });
+
+  const avatar = watch('avatar');
 
   const { File, onOpen: onOpenSelectFile } = useSelectFile({
     fileType: '.jpg,.png',
@@ -77,9 +79,14 @@ const Me = () => {
       try {
         const formData = new FormData();
         formData.append('file', file);
-        const src = await uploadFile(formData);
+        const { fileUrl: src } = await uploadFile(formData);
 
         onclickSave({
+          ...userInfo,
+          avatar: src,
+        });
+
+        setUserInfo({
           ...userInfo,
           avatar: src,
         });
@@ -122,7 +129,7 @@ const Me = () => {
                   mb={10}
                   onClick={onOpenSelectFile}
                 >
-                  <Avatar src={'userInfo?.avatar'} borderRadius={'50%'} w={'100%'} h={'100%'} />
+                  <Avatar src={avatar} borderRadius={'50%'} w={'100%'} h={'100%'} />
                 </Box>
               </MyTooltip>
             </Flex>
@@ -138,10 +145,12 @@ const Me = () => {
                   transform={'translateX(-11px)'}
                   maxLength={20}
                   onBlur={(e) => {
+                    if (!userInfo) return;
                     const val = e.target.value;
                     if (val === userInfo?.nickname) return;
                     try {
                       putUpdateMemberName(val);
+                      setUserInfo({ ...userInfo, nickname: val });
                     } catch (error) {}
                   }}
                 />

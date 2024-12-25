@@ -139,7 +139,7 @@ const Comment = () => {
   }, [TextareaDom, inputValue, textareaMinH, handleSend, context.replyDataList.length]);
 
   return (
-    <Flex flexDir={'column'} w={'100%'} bg={'white'} p={6}>
+    <Flex flexDir={'column'} w={'100%'} bg={'white'} p={6} id="comment">
       <Box fontSize={'lg'} fontWeight={'bold'} color={'myGray.900'}>
         <h1>{`${context.replyDataList.length} 条评论`}</h1>
       </Box>

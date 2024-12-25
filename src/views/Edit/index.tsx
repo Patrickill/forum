@@ -10,7 +10,7 @@ import {
   useDisclosure,
 } from '@chakra-ui/react';
 import MarkdownEditor from './components/MarkdownEditer';
-import { useForm } from 'react-hook-form';
+import { set, useForm } from 'react-hook-form';
 import { createPostType } from '@/types/core/post';
 import MySelect from '@/components/common/MySelect';
 import MultipleSelect from '@/components/common/MySelect/MultipleSelect';
@@ -25,6 +25,7 @@ import { useToast } from '@/hooks/support/useToast';
 import { usePostStore } from '@/store/core/usePostStore';
 import { getNanoid } from '@/utils/support/tools';
 import { addTag, getTagList } from '@/api/core/tag';
+import { createPost } from '@/api/core/post';
 
 const Editor = () => {
   const {
@@ -37,6 +38,8 @@ const Editor = () => {
   } = useForm<createPostType>({
     defaultValues: {
       visibility: 4,
+      link: [],
+      tags: [],
     },
   });
 
@@ -58,9 +61,10 @@ const Editor = () => {
       try {
         const formData = new FormData();
         formData.append('file', file);
-        const src = await uploadFile(formData);
+        const { fileUrl: src } = await uploadFile(formData);
 
         //在文章中添加图片，在link里添加图片链接
+        setValue('content', content + `\n ![image](${src})`);
       } catch (err: any) {
         toast({
           title: typeof err === 'string' ? err : '上传失败',
@@ -83,50 +87,38 @@ const Editor = () => {
 
   const { isOpen: isOpenDraft, onOpen: onOpenDraft, onClose: onCloseDraft } = useDisclosure();
 
-  const defaultCategory = [
-    {
-      id: 17161302659070,
-      tag: '美食',
-    },
-    {
-      id: 1805756781475170,
-      tag: '美食食食',
-    },
-    {
-      id: 187022152407040,
-      tag: '美物物食',
-    },
-    {
-      id: 187781568917500,
-      tag: '美美美美美',
-    },
-  ];
-
-  const [categoryId, content, tags, visibility] = watch([
+  const [categoryId, content, tags, visibility, link] = watch([
     'categoryId',
     'content',
     'tags',
     'visibility',
+    'link',
   ]);
 
   const {
     data: tagList,
     mutate: setTagList,
     refresh,
-  } = useRequest2(getTagList, {
-    manual: false,
-    defaultParams: [
-      {
+    loading: tagListLoading,
+  } = useRequest2(
+    () => {
+      if (searchKey === '') {
+        return Promise.resolve([]);
+      }
+      return getTagList({
         q: searchKey,
-      },
-    ],
-    refreshDeps: [searchKey],
-  });
-
-  const { runAsync: addTagAsync } = useRequest2(
-    ({ name }: { name: string }) => addTag({ name }),
-    {}
+      });
+    },
+    {
+      manual: false,
+      debounceWait: 100,
+      refreshDeps: [searchKey],
+    }
   );
+
+  const { runAsync: addTagAsync } = useRequest2(({ name }: { name: string }) => addTag({ name }), {
+    successToast: '添加成功',
+  });
 
   const RenderTagHeader = () => {
     const [addTag, setAddTag] = useState('');
@@ -159,9 +151,16 @@ const Editor = () => {
     );
   };
 
-  const onClickSave = useCallback(() => {
-    console.log('save');
-  }, []);
+  const { run: onClickCreate, loading } = useRequest2(
+    (data: createPostType) => {
+      console.log('data', data);
+
+      return createPost(data);
+    },
+    {
+      successToast: '发帖成功',
+    }
+  );
 
   return (
     <Box h={'100%'} overflow={'auto'} borderRadius={'lg'} bg={'myGray.50'}>
@@ -214,7 +213,7 @@ const Editor = () => {
         </Flex>
 
         <MarkdownEditor minHeight={2} value={content} setValue={(v) => setValue('content', v)} />
-
+        <Box {...register('link')}></Box>
         <Box>
           <Button onClick={onOpenSelectFile}>上传图片</Button>
         </Box>
@@ -222,10 +221,11 @@ const Editor = () => {
         <FormControl>
           <FormLabel label={'标签'} />
           <MultipleSelect<number>
-            list={defaultCategory.map((item, index) => ({ label: item.tag, value: item.id }))}
+            list={tagList?.map((item, index) => ({ label: item.tag, value: item.id })) || []}
             value={tags as any}
             onSelect={(val) => setValue('tags', val)}
             header={RenderTagHeader()}
+            loading={tagListLoading}
           />
         </FormControl>
 
@@ -258,7 +258,9 @@ const Editor = () => {
           >
             {'存为草稿'}
           </Button>
-          <Button onClick={() => handleSubmit((data) => console.log(data))()}>{'发帖'}</Button>
+          <Button isLoading={loading} onClick={() => handleSubmit(onClickCreate)()}>
+            {'发帖'}
+          </Button>
         </Flex>
       </Flex>
       <File onSelect={onSelectFile} />

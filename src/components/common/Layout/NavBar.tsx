@@ -30,7 +30,7 @@ const Navbar = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   const { userInfo } = useUserStore();
-
+  console.log('userInfo 侧边栏', userInfo);
   const navbarList = useMemo(
     () => [
       {

@@ -2,17 +2,24 @@ import React from 'react';
 import { Flex, Box, BoxProps, Icon } from '@chakra-ui/react';
 import { IconType } from 'react-icons';
 
-type Props = Omit<BoxProps, 'onChange'> & {
+type Props<ValueType = string> = Omit<BoxProps, 'onChange'> & {
   list: {
     icon?: IconType;
     label: string | React.ReactNode;
-    value: string;
+    value: ValueType;
   }[];
-  value: string;
-  onChange: (e: string) => void;
+  value: ValueType;
+  onChange: (e: ValueType) => void;
 };
 
-const FillRowTabs = ({ list, value, onChange, py = '7px', px = '12px', ...props }: Props) => {
+const FillRowTabs = <ValueType = string,>({
+  list,
+  value,
+  onChange,
+  py = '7px',
+  px = '12px',
+  ...props
+}: Props<ValueType>) => {
   return (
     <Box
       display={'inline-flex'}
@@ -29,7 +36,6 @@ const FillRowTabs = ({ list, value, onChange, py = '7px', px = '12px', ...props 
     >
       {list.map((item) => (
         <Flex
-          key={item.value}
           flex={'1 0 0'}
           alignItems={'center'}
           justifyContent={'center'}

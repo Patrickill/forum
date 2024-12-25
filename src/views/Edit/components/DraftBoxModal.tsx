@@ -49,7 +49,8 @@ const DraftBoxModal = ({
                           variant={'outline'}
                           size={'sm'}
                           onClick={() => {
-                            reset(item);
+                            const { id, time, ...resetData } = item;
+                            reset(resetData);
                             onClose();
                           }}
                         >

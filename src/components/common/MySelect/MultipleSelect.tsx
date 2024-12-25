@@ -17,6 +17,7 @@ import React, { useRef } from 'react';
 import { FaCheck } from 'react-icons/fa';
 import MyTag from '../Tag/index';
 import TagCard from '@/components/core/tag/TagCard';
+import MyBox from '../MyBox';
 
 export type SelectProps<T = any> = {
   value: T[];
@@ -29,6 +30,7 @@ export type SelectProps<T = any> = {
   maxH?: number;
   onSelect: (val: T[]) => void;
   header: React.ReactNode;
+  loading: boolean;
 } & Omit<ButtonProps, 'onSelect'>;
 
 const MultipleSelect = <T = any,>({
@@ -39,6 +41,7 @@ const MultipleSelect = <T = any,>({
   maxH = 400,
   onSelect,
   header,
+  loading,
   ...props
 }: SelectProps<T>) => {
   const ref = useRef<HTMLButtonElement>(null);
@@ -113,6 +116,7 @@ const MultipleSelect = <T = any,>({
 
         <MenuList py={0}>
           {header}
+
           <Flex
             className={props.className}
             minW={(() => {
@@ -149,6 +153,11 @@ const MultipleSelect = <T = any,>({
                 )}
               </Box>
             ))}
+            {list.length === 0 && (
+              <Flex align={'center'} justify={'center'} w={'100%'} h={'20px'}>
+                <Box>{loading ? '加载中...' : '暂无搜索结果~'}</Box>
+              </Flex>
+            )}
           </Flex>
         </MenuList>
       </Menu>

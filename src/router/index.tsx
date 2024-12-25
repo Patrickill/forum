@@ -7,6 +7,7 @@ import Me from '@/views/Me';
 import Editor from '@/views/Edit';
 import Post from '@/views/Post';
 import Tag from '@/views/Tag';
+import Search from '@/views/Search';
 
 /**
  * 公共路由
@@ -56,6 +57,11 @@ export const constantRoutes: RouteObject[] = [
     path: '/tag',
     id: 'tag',
     element: <Tag />,
+  },
+  {
+    path: '/search',
+    id: 'search',
+    element: <Search />,
   },
 ];
 
