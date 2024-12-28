@@ -200,6 +200,7 @@ export function usePagination<ResT = any>({
       // Watch scroll position
       useThrottleEffect(
         () => {
+          console.log('scroll', scroll);
           if (!ref?.current || type !== 'scroll' || noMore) return;
           const { scrollTop, scrollHeight, clientHeight } = ref.current;
 

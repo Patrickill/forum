@@ -18,18 +18,26 @@ export const getHotPostList = ({ pageNum = 1, pageSize = 10 }: PaginationProps) 
   });
 
 export const getStaredPostList = (data: RequestPaging) =>
-  GET<PagingData<postDetailType>>('/api/post/star/get', data);
+  GET<PagingData<postDetailType>>('/api/post/upvote/list', data);
 
 export const getCollectPostList = (data: RequestPaging) =>
   GET<PagingData<postDetailType>>('/api/post/collect/get', data);
 
-export const starPost = (data: { postId: string }) => POST('/api/post/star/add', data);
+export const starPost = (data: { postId: number }) => POST('/api/post/upvote', data);
 
-export const collectPost = (data: { postId: string }) => POST('/api/post/collect/add', data);
+export const collectPost = (data: { postId: number }) => POST('/api/post/collect/add', data);
 
-export const CancelStarPost = (data: { postId: string }) => POST('/api/post/star/del', data);
+export const CancelStarPost = (data: { postId: number }) => POST('/api/post/downvote', data);
 
-export const CancelCollectPost = (data: { postId: string }) => POST('/api/post/collect/del', data);
+export const CancelCollectPost = (data: { postId: number }) => POST('/api/post/collect/del', data);
 
 export const searchPost = (data: { q: string } & RequestPaging) =>
   GET<PagingData<postListType>>('/api/search/post', data);
+
+export const getMyPostList = (data: RequestPaging & { authorId: string }) =>
+  GET<PagingData<postListType>>('/api/post/list/user', data);
+
+export const delPost = (data: { id: number }) => POST('/api/post/del', data);
+
+export const getPostByTag = (data: { tagId: string } & RequestPaging) =>
+  GET<PagingData<postListType>>('/api/post/tag/list', data);

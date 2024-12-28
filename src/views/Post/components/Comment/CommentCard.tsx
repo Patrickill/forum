@@ -7,11 +7,12 @@ import MyIcon from '@/components/common/MyIcon';
 import MyTooltip from '@/components/common/MyToolTip';
 import { useCallback, useContext, useState } from 'react';
 import { useRequest2 } from '@/hooks/core/useRequest';
-import { createReply, delReply } from '@/api/core/reply';
+import { createReply, delReply, downvoteReply, upvoteReply } from '@/api/core/reply';
 import { useToast } from '@/hooks/support/useToast';
 import { useUserStore } from '@/store/support/useUserStore';
 
 const CommentCard = ({ reply }: { reply: ReplyType }) => {
+  console.log('reply', reply);
   return (
     <Box w={'100%'}>
       <ReplyCard {...reply} />
@@ -27,17 +28,18 @@ const CommentCard = ({ reply }: { reply: ReplyType }) => {
 const ReplyCard = ({
   content,
   createdOn,
-  userId,
+  user,
   parent,
   root,
-  thumbsUpCount,
+  upvoteCount,
   replyCount,
   id,
   postId,
+  isUpvote,
 }: ReplyDetailType) => {
   const context = useContext(CommentContext);
-  const { userMap, replyMap, setReplyDataList } = { ...context };
-
+  const { userMap, replyMap, setReplyDataList, refresh } = { ...context };
+  const [isUpvoted, setisUpvoted] = useState(isUpvote);
   const { userInfo } = useUserStore();
 
   const [inputValue, setValue] = useState<string>('');
@@ -50,7 +52,7 @@ const ReplyCard = ({
         title: '删除成功',
         status: 'success',
       });
-      setReplyDataList((pre) => pre.filter((item) => item.id !== id));
+      refresh();
     },
   });
 
@@ -63,59 +65,62 @@ const ReplyCard = ({
       postId,
     }).then(() => {
       toast({ status: 'success', title: '回复成功' });
-      setReplyDataList((pre) => {
-        const res = pre.map((item) => {
-          if (item.id === id) {
-            return {
-              ...item,
-              replyCount: item.replyCount + 1,
-            };
-          }
-          return item;
-        });
-        return [
-          ...res,
-          {
-            content: inputValue,
-            createdOn: new Date().toISOString(),
-            deletedOn: null,
-            id: Math.floor(Math.random() * 1000000),
-            ip: '',
-            ipLoc: '',
-            isEssence: false,
-            modifiedOn: '',
-            parent: id,
-            postId: postId,
-            replyCount: 0,
-            root: root === 0 ? id : root,
-            thumbsDownCount: 0,
-            thumbsUpCount: 0,
-            userId: userInfo?.id || 111,
-          },
-        ];
-      });
+      setShowCommentInput(false);
+      setValue('');
+
+      refresh();
     });
   }, [inputValue, id, root, postId, userInfo?.id, setReplyDataList, toast]);
+
+  const { run: handleUpvote } = useRequest2(
+    () => {
+      return isUpvoted ? downvoteReply({ replyId: id }) : upvoteReply({ replyId: id });
+    },
+    {
+      onSuccess: () => {
+        setisUpvoted((pre) => !pre);
+        setReplyDataList((pre) => {
+          return pre.map((item) => {
+            console.log('item', item);
+            if (item.id === id) {
+              return {
+                ...item,
+                upvoteCount: item.upvoteCount + (isUpvoted ? -1 : 1),
+                isUpvote: !isUpvoted,
+              };
+            }
+            return item;
+          });
+        });
+      },
+    }
+  );
 
   return (
     <Flex w={'100%'} p={2}>
       {/* <Box>{'id' + id + ' root ' + root + ' parent ' + parent}</Box> */}
       <Box>
-        <Avatar mt={2} h={'30px'} w={'30px'} src={userMap[userId]?.avatar} />
+        <Avatar mt={2} h={'30px'} w={'30px'} src={userMap[user.id]?.avatar} />
       </Box>
       <Box pl={4} pos={'relative'} flex={1} pb={2}>
         <Box fontSize={'md'}>
           {root === parent
-            ? userMap[userId]?.nickname
-            : `${userMap[userId]?.nickname} 回复 ${userMap[replyMap[parent].userId]?.nickname}`}
+            ? userMap[user.id]?.nickname
+            : `${userMap[user.id]?.nickname} 回复 ${userMap[replyMap[parent].user.id]?.nickname}`}
         </Box>
         <Box fontSize={'large'} color={'myGray.900'}>
           {content}
         </Box>
         <Flex gap={4} w={'100%'} fontSize={'sm'} py={2}>
           <Box>{formatTimeToChatTime(new Date(createdOn))}</Box>
-          <Flex align={'center'} gap={1} _hover={{ cursor: 'pointer' }}>
-            <MyIcon name="like" /> {thumbsUpCount ? thumbsUpCount : '点赞'}
+          <Flex
+            align={'center'}
+            gap={1}
+            _hover={{ cursor: 'pointer' }}
+            onClick={handleUpvote}
+            color={isUpvoted ? 'primary.600' : 'myGray.600'}
+          >
+            <MyIcon name="like" /> {upvoteCount ? upvoteCount : '点赞'}
           </Flex>
           <Flex
             align={'center'}
@@ -125,17 +130,19 @@ const ReplyCard = ({
           >
             <MyIcon name="comment" /> {replyCount ? replyCount : '回复'}
           </Flex>
-          <Box
-            pos={'absolute'}
-            right={0}
-            color={'myGray.400'}
-            _hover={{ color: 'red', cursor: 'pointer' }}
-            onClick={() => {
-              deleteReply({ replyId: id });
-            }}
-          >
-            <MyIcon name="trash" />
-          </Box>
+          {userInfo?.id === user.id && (
+            <Box
+              pos={'absolute'}
+              right={0}
+              color={'myGray.400'}
+              _hover={{ color: 'red', cursor: 'pointer' }}
+              onClick={() => {
+                deleteReply({ replyId: id });
+              }}
+            >
+              <MyIcon name="trash" />
+            </Box>
+          )}
         </Flex>
 
         {/* 回复 */}

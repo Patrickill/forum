@@ -9,7 +9,7 @@ export interface PostLink {
 }
 export interface postDetailType {
   collectionCount: number;
-  commentCount: number;
+  replyCount: number;
   content: string;
   createdOn: string;
   id: number;
@@ -45,7 +45,7 @@ export interface createPostType {
 
 export interface postListType {
   collectionCount: number;
-  commentCount: number;
+  replyCount: number;
   content: string;
   createdOn: string;
   id: number;
@@ -61,6 +61,7 @@ export interface postListType {
   user: UserType;
   viewCount: number;
   visibility: number;
+  modifiedOn?: string;
 }
 
 export interface TagType {

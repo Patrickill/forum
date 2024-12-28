@@ -43,6 +43,14 @@ const Editor = () => {
     },
   });
 
+  const [categoryId, content, tags, visibility, link] = watch([
+    'categoryId',
+    'content',
+    'tags',
+    'visibility',
+    'link',
+  ]);
+
   const [searchKey, setSearchKey] = useState('');
 
   const { toast } = useToast();
@@ -62,9 +70,9 @@ const Editor = () => {
         const formData = new FormData();
         formData.append('file', file);
         const { fileUrl: src } = await uploadFile(formData);
-
+        console.log('content', content);
         //在文章中添加图片，在link里添加图片链接
-        setValue('content', content + `\n ![image](${src})`);
+        setValue('content', content ? content + `![image](${src})` : `![image](${src})`);
       } catch (err: any) {
         toast({
           title: typeof err === 'string' ? err : '上传失败',
@@ -72,7 +80,7 @@ const Editor = () => {
         });
       }
     },
-    [toast]
+    [toast, content, setValue]
   );
 
   const { data: topicList } = useRequest2(getTopicList, {
@@ -86,14 +94,6 @@ const Editor = () => {
   ];
 
   const { isOpen: isOpenDraft, onOpen: onOpenDraft, onClose: onCloseDraft } = useDisclosure();
-
-  const [categoryId, content, tags, visibility, link] = watch([
-    'categoryId',
-    'content',
-    'tags',
-    'visibility',
-    'link',
-  ]);
 
   const {
     data: tagList,

@@ -6,20 +6,23 @@ import { useToast } from '@/hooks/support/useToast';
 import { useUserStore } from '@/store/support/useUserStore';
 import { UserType } from '@/types/support/user';
 import { Avatar, Box, BoxProps, Button, Flex, Input, useDisclosure } from '@chakra-ui/react';
-import { useCallback, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import UpdatePswModal from './components/UpdatePswModal';
 import LightRowTabs from '@/components/common/Tabs/LightRowTabs';
 import { useRequest2 } from '@/hooks/core/useRequest';
 import { updateUserInfo } from '@/api/support/user';
 import { usePagination } from '@/hooks/support/usePagination';
-import { getCollectPostList, getStaredPostList } from '@/api/core/post';
+import { delPost, getCollectPostList, getMyPostList, getStaredPostList } from '@/api/core/post';
 import EmptyTip from '@/components/common/EmptyTip';
 import PostCard from '@/components/core/post/PostCard';
+import Loading from '@/components/common/MyLoading';
+import useRoute from '@/hooks/support/useRouter';
 
 enum TabEnum {
   like = 'like',
   star = 'star',
+  my = 'my',
 }
 
 export interface UserUpdateParams {
@@ -29,10 +32,14 @@ export interface UserUpdateParams {
 
 const Me = () => {
   const { userInfo, setUserInfo } = useUserStore();
-  const { toast } = useToast();
-  console.log('userInfo', userInfo);
 
-  const [currentTab, setCurrentTab] = useState(TabEnum.like);
+  const { toast } = useToast();
+
+  const { getQueryParam } = useRoute();
+
+  const userId = getQueryParam('id');
+
+  const [currentTab, setCurrentTab] = useState(TabEnum.my);
 
   const {
     isOpen: isOpenUpdatePsw,
@@ -104,11 +111,18 @@ const Me = () => {
     if (!userInfo) return Promise.reject();
     return updateUserInfo({ ...userInfo, nickname: name });
   }, {});
+  const ScrollContainerRef = useRef<HTMLDivElement>(null);
 
-  const { data, isLoading } = usePagination({
-    api: currentTab === TabEnum.like ? getStaredPostList : getCollectPostList,
+  const { data, isLoading, setData, ScrollData } = usePagination({
+    api:
+      currentTab === TabEnum.my
+        ? getMyPostList
+        : currentTab === TabEnum.like
+          ? getStaredPostList
+          : getCollectPostList,
     pageSize: 10,
     defaultRequest: true,
+    params: { authorId: userId || userInfo?.id },
     refreshDeps: [currentTab],
   });
 
@@ -118,8 +132,8 @@ const Me = () => {
       <Box p={10}>
         <Flex h={'200px'} w={'100%'} bg={'myGray.100'} align={'center'} borderRadius={'xl'}>
           <Flex align={'center'}>
-            <Flex alignItems={'center'} cursor={'pointer'} p={10}>
-              <MyTooltip label={'点击修改头像'}>
+            <Flex alignItems={'center'} cursor={userId ? 'default' : 'pointer'} p={10}>
+              <MyTooltip label={userId ? '' : '点击修改头像'}>
                 <Box
                   w={'100px'}
                   h={'100px'}
@@ -127,7 +141,9 @@ const Me = () => {
                   overflow={'hidden'}
                   p={'2px'}
                   mb={10}
-                  onClick={onOpenSelectFile}
+                  onClick={() => {
+                    if (!userId) onOpenSelectFile();
+                  }}
                 >
                   <Avatar src={avatar} borderRadius={'50%'} w={'100%'} h={'100%'} />
                 </Box>
@@ -153,21 +169,24 @@ const Me = () => {
                       setUserInfo({ ...userInfo, nickname: val });
                     } catch (error) {}
                   }}
+                  isReadOnly={!!userId}
                 />
               </Box>
-              <Box>
-                <Flex alignItems={'center'}>
-                  <Box {...labelStyles}>{'账号'}:&nbsp;</Box>
-                  <Box>{userInfo?.username || ''}</Box>
-                </Flex>
-                <Flex alignItems={'center'} gap={2}>
-                  <Box {...labelStyles}>{'密码'}:&nbsp;</Box>
-                  <Box>*****</Box>
-                  <Button size={'sm'} variant={'whitePrimary'} onClick={onOpenUpdatePsw}>
-                    {'修改'}
-                  </Button>
-                </Flex>
-              </Box>
+              {!userId && (
+                <Box>
+                  <Flex alignItems={'center'}>
+                    <Box {...labelStyles}>{'账号'}:&nbsp;</Box>
+                    <Box>{userInfo?.username || ''}</Box>
+                  </Flex>
+                  <Flex alignItems={'center'} gap={2}>
+                    <Box {...labelStyles}>{'密码'}:&nbsp;</Box>
+                    <Box>*****</Box>
+                    <Button size={'sm'} variant={'whitePrimary'} onClick={onOpenUpdatePsw}>
+                      {'修改'}
+                    </Button>
+                  </Flex>
+                </Box>
+              )}
             </Flex>
           </Flex>
         </Flex>
@@ -176,27 +195,32 @@ const Me = () => {
           <LightRowTabs<TabEnum>
             list={[
               {
-                label: '点赞',
-                value: TabEnum.like,
+                label: (userId ? '他' : '我') + '发布的',
+                value: TabEnum.my,
               },
-              {
-                label: '收藏',
-                value: TabEnum.star,
-              },
+              ...(!userId
+                ? [
+                    {
+                      label: '收藏',
+                      value: TabEnum.star,
+                    },
+                    {
+                      label: '点赞',
+                      value: TabEnum.like,
+                    },
+                  ]
+                : []),
             ]}
             onChange={setCurrentTab}
             value={currentTab}
             px={4}
             width={'200px'}
           />
-          <Box mt={5}>
-            {!isLoading && data.length === 0 && (
-              <EmptyTip text={currentTab === TabEnum.like ? '暂无点赞记录~' : '暂无收藏记录~'} />
-            )}
-            {data.map((item) => (
-              <PostCard key={item.id} {...item} />
-            ))}
-          </Box>
+          <ScrollData ScrollContainerRef={ScrollContainerRef} mt={5}>
+            {isLoading && <Loading />}
+            {!isLoading && data.length === 0 && <EmptyTip text={'暂无记录~'} />}
+            {data.map((item) => item.id && <PostCard key={item.id} {...item} setData={setData} />)}
+          </ScrollData>
         </Box>
 
         {isOpenUpdatePsw && <UpdatePswModal onClose={onCloseUpdatePsw} />}

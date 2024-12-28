@@ -1,6 +1,13 @@
 import { BiLike, BiSolidDislike, BiSolidLike, BiDislike } from 'react-icons/bi';
 import { MdOutlineRemoveRedEye } from 'react-icons/md';
-import { FaRegStar, FaStar, FaRegCommentDots, FaRegClock, FaTrashAlt } from 'react-icons/fa';
+import {
+  FaRegStar,
+  FaStar,
+  FaRegCommentDots,
+  FaRegClock,
+  FaTrashAlt,
+  FaSearch,
+} from 'react-icons/fa';
 import { IoSend } from 'react-icons/io5';
 import { CiLogout } from 'react-icons/ci';
 
@@ -17,4 +24,5 @@ export const IconLib = {
   clock: FaRegClock,
   trash: FaTrashAlt,
   out: CiLogout,
+  search: FaSearch,
 };

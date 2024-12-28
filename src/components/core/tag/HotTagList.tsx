@@ -42,7 +42,7 @@ export const TagList = ({ tagList }: { tagList: TagType[] }) => {
   return (
     <Flex flexWrap={'wrap'} gap={2}>
       {tagList.map((item) => (
-        <TagCard tag={item.tag} />
+        <TagCard tag={item.tag} tagId={item.id} />
       ))}
     </Flex>
   );

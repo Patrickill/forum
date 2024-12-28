@@ -1,19 +1,20 @@
+import { UserType } from '../support/user';
+
 export interface ReplyDataType {
   content: string;
   createdOn: string;
-  deletedOn: null;
   id: number;
   ip: string;
   ipLoc: string;
   isEssence: boolean;
-  modifiedOn: string;
+  isUpvote: boolean;
   parent: number;
   postId: number;
   replyCount: number;
   root: number;
-  thumbsDownCount: number;
-  thumbsUpCount: number;
-  userId: number;
+
+  upvoteCount: number;
+  user: UserType;
 }
 
 export interface ReplyDetailType extends ReplyDataType {}

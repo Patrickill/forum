@@ -1,3 +1,4 @@
+import SearchInput from '@/components/core/post/SearchInput';
 import useRoute from '@/hooks/support/useRouter';
 import { Avatar, Box, Flex } from '@chakra-ui/react';
 import { useEffect, useState } from 'react';
@@ -41,16 +42,19 @@ const Header = ({ isVisible = true }: { isVisible?: boolean }) => {
         </Box>
       </Flex>
 
-      <Box
-        flex={'0 0 auto'}
-        borderRadius={'50%'}
-        overflow={'hidden'}
-        cursor={'pointer'}
-        onClick={() => push('/me')}
-        pr={8}
-      >
-        <Avatar w={'36px'} h={'36px'} src={'/logo.svg'} borderRadius={'50%'} />
-      </Box>
+      <Flex pr={8} gap={10}>
+        <SearchInput />
+        <Box>
+          <Avatar
+            cursor={'pointer'}
+            borderRadius={'50%'}
+            w={'36px'}
+            h={'36px'}
+            src={'/logo.svg'}
+            onClick={() => push('/me')}
+          />
+        </Box>
+      </Flex>
     </Flex>
   );
 };

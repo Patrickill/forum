@@ -17,3 +17,10 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
+em {
+  background-color: yellow; /* 背景色 */
+  color: red;               /* 字体颜色 */
+  font-weight: bold;        /* 加粗 */        /* 内边距 */
+  border-radius: 3px;      /* 圆角效果 */
+}

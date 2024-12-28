@@ -14,7 +14,7 @@ import HotTagList, { TagList } from '@/components/core/tag/HotTagList';
 import Comment from './components/Comment';
 
 const Post = () => {
-  const { getQueryParam } = useRoute();
+  const { getQueryParam, openNewTab } = useRoute();
 
   const commentRef = useRef<HTMLDivElement>(null);
   const scrollToComment = () => {
@@ -23,12 +23,13 @@ const Post = () => {
     }
   };
 
-  const { data: post, loading } = useRequest2(
-    () => getPostById({ postId: getQueryParam('postId') || '' }),
-    {
-      manual: false,
-    }
-  );
+  const {
+    data: post,
+    loading,
+    refresh,
+  } = useRequest2(() => getPostById({ postId: getQueryParam('postId') || '' }), {
+    manual: false,
+  });
 
   return (
     <MyBox bg={'myGray.50'} w={'100%'} h={'100%'} overflow={'overlay'} isLoading={loading}>
@@ -41,10 +42,12 @@ const Post = () => {
         w={'80px'}
         upvoteCount={post?.upvoteCount || 0}
         collectionCount={post?.collectionCount || 0}
-        commentCount={post?.commentCount || 0}
+        replyCount={post?.replyCount || 0}
         isCollect={post?.isCollect || false}
         isUpvote={post?.isUpvote || false}
         scrollToComment={scrollToComment}
+        postId={post?.id || 0}
+        refresh={refresh}
       />
 
       <Flex minH={`calc(100vh - 100px)`} mt={'100px'} ml={'10%'} gap={10}>
@@ -78,11 +81,18 @@ const Post = () => {
         {/* 侧边栏 */}
         <Flex flexDir={'column'} gap={6} w={'25%'}>
           <Flex p={6} bg={'white'} flexDir={'column'} justify={'center'} align={'center'} gap={2}>
-            <Avatar src={post?.user.avatar || ''} />
+            <Avatar
+              src={post?.user.avatar || ''}
+              _hover={{ cursor: 'pointer' }}
+              onClick={() => {
+                if (!post?.user.id) return;
+                openNewTab({ path: '/me', params: { id: post?.user.id.toString() } });
+              }}
+            />
             <Box fontSize={'lg'}>{post?.user.nickname}</Box>
           </Flex>
           <Box bg={'white'} p={6}>
-            {/* <HotPostList /> */}
+            <HotPostList />
           </Box>
         </Flex>
       </Flex>

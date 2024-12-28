@@ -66,7 +66,7 @@ export const formatTimeToChatItemTime = (time: Date) => {
 
 export const calculateReadingTime = (text: string) => {
   const wordsPerMinute = 250; // 假设的阅读速度
-  const words = text.split(/\s+/).filter(Boolean).length; // 分词，并过滤掉空字符串
+  const words = text.length;
   const minutes = Math.ceil(words / wordsPerMinute); // 计算分钟
   return minutes;
 };

@@ -23,28 +23,7 @@ const Comment = () => {
     },
     {
       onSuccess: () => {
-        context.setReplyDataList((pre) => {
-          return [
-            {
-              content: inputValue!,
-              createdOn: new Date().toISOString(),
-              deletedOn: null,
-              id: Math.floor(Math.random() * 1000000),
-              ip: '',
-              ipLoc: '',
-              isEssence: false,
-              modifiedOn: new Date().toISOString(),
-              parent: 0,
-              postId: context.postId,
-              replyCount: 0,
-              root: 0,
-              thumbsDownCount: 0,
-              thumbsUpCount: 0,
-              userId: userInfo?.id || 111,
-            },
-            ...pre,
-          ];
-        });
+        context.refresh();
 
         TextareaDom.current?.focus();
       },

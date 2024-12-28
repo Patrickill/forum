@@ -1,5 +1,6 @@
 import { TopicType } from '@/types/core/topic';
 import { DELETE, GET, POST, PUT } from '../utils/request';
+import { PaginationResponse } from '@/types/support/request';
 
 export const createTopic = ({ name, description }: TopicType) =>
   POST('/api/post/category/create', { name, description });
@@ -11,4 +12,4 @@ export const updateTopic = ({ id, name, description }: TopicType & { id: string 
 
 export const deleteTopic = ({ id }: { id: string }) => DELETE('/api/post/category/del', { id });
 
-export const getTopicList = () => GET<TopicType[]>('/api/post/category/list');
+export const getTopicList = () => GET<PaginationResponse<TopicType>>('/api/post/category/list');
