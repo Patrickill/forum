@@ -11,7 +11,7 @@ import { useForm } from 'react-hook-form';
 import UpdatePswModal from './components/UpdatePswModal';
 import LightRowTabs from '@/components/common/Tabs/LightRowTabs';
 import { useRequest2 } from '@/hooks/core/useRequest';
-import { updateUserInfo } from '@/api/support/user';
+import { getUserInfoById, updateUserInfo } from '@/api/support/user';
 import { usePagination } from '@/hooks/support/usePagination';
 import { delPost, getCollectPostList, getMyPostList, getStaredPostList } from '@/api/core/post';
 import EmptyTip from '@/components/common/EmptyTip';
@@ -126,6 +126,16 @@ const Me = () => {
     refreshDeps: [currentTab],
   });
 
+  const { data: userInfoData } = useRequest2(
+    () => {
+      if (!userId) return Promise.reject();
+      return getUserInfoById({ id: Number(userId) });
+    },
+    {
+      manual: false,
+    }
+  );
+
   return (
     <PageContainer>
       {/* <Box className="textEllipsis" w={'200px'}> */}
@@ -145,7 +155,12 @@ const Me = () => {
                     if (!userId) onOpenSelectFile();
                   }}
                 >
-                  <Avatar src={avatar} borderRadius={'50%'} w={'100%'} h={'100%'} />
+                  <Avatar
+                    src={userInfoData?.avatar || avatar}
+                    borderRadius={'50%'}
+                    w={'100%'}
+                    h={'100%'}
+                  />
                 </Box>
               </MyTooltip>
             </Flex>
@@ -155,7 +170,7 @@ const Me = () => {
                 <Input
                   flex={'1 0 0'}
                   fontSize={'2xl'}
-                  defaultValue={userInfo?.nickname}
+                  defaultValue={userInfoData?.nickname || userInfo?.nickname}
                   title={'点击修改昵称'}
                   borderColor={'transparent'}
                   transform={'translateX(-11px)'}

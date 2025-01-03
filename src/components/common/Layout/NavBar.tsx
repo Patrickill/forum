@@ -40,20 +40,7 @@ const Navbar = () => {
         link: '/home',
         activeLink: ['/home'],
       },
-      {
-        label: '快讯',
-        icon: MdOutlineMessage,
-        activeIcon: MdMessage,
-        link: `/alerts`,
-        activeLink: ['/alerts'],
-      },
-      {
-        label: '消息',
-        icon: IoMailOutline,
-        activeIcon: IoMailOutline,
-        link: `/message`,
-        activeLink: ['/message'],
-      },
+
       {
         label: '我的',
         icon: TiUserOutline,
@@ -61,13 +48,7 @@ const Navbar = () => {
         link: '/me',
         activeLink: ['/me'],
       },
-      {
-        label: '设置',
-        icon: IoSettingsOutline,
-        activeIcon: IoSettingsSharp,
-        link: '/setting',
-        activeLink: ['/setting'],
-      },
+
       {
         label: '退出',
         icon: CiLogout,

@@ -2,30 +2,15 @@ import { Box, Flex } from '@chakra-ui/react';
 import TagCard from './TagCard';
 import MyDivider from '@/components/common/MyDivider';
 import { TagType } from '@/types/core/post';
+import { usePagination } from '@/hooks/support/usePagination';
+import { getHotPostList } from '@/api/core/post';
+import { getHotTagList } from '@/api/core/tag';
 
 const HotTagList = () => {
-  const testTag = [
-    {
-      tag: 'test',
-      id: 1,
-    },
-    {
-      tag: 'test2',
-      id: 2,
-    },
-    {
-      tag: 'test3',
-      id: 3,
-    },
-    {
-      tag: 'test222222229',
-      id: 9,
-    },
-    {
-      tag: 'test11111111111111110',
-      id: 10,
-    },
-  ];
+  const { data: tagList } = usePagination({
+    api: getHotTagList,
+    defaultRequest: true,
+  });
 
   return (
     <>
@@ -33,7 +18,7 @@ const HotTagList = () => {
         {'本周热门标签'}
       </Box>
       <MyDivider px={2} />
-      <TagList tagList={testTag} />
+      <TagList tagList={tagList} />
     </>
   );
 };
@@ -42,7 +27,7 @@ export const TagList = ({ tagList }: { tagList: TagType[] }) => {
   return (
     <Flex flexWrap={'wrap'} gap={2}>
       {tagList.map((item) => (
-        <TagCard tag={item.tag} tagId={item.id} />
+        <TagCard tag={item.name} tagId={item.id} />
       ))}
     </Flex>
   );

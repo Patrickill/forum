@@ -31,6 +31,8 @@ const Post = () => {
     manual: false,
   });
 
+  console.log('post', post);
+
   return (
     <MyBox bg={'myGray.50'} w={'100%'} h={'100%'} overflow={'overlay'} isLoading={loading}>
       <Header />
@@ -41,7 +43,7 @@ const Post = () => {
         h={'300px'}
         w={'80px'}
         upvoteCount={post?.upvoteCount || 0}
-        collectionCount={post?.collectionCount || 0}
+        collectCount={post?.collectCount || 0}
         replyCount={post?.replyCount || 0}
         isCollect={post?.isCollect || false}
         isUpvote={post?.isUpvote || false}

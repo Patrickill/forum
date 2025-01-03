@@ -12,10 +12,10 @@ import { useToast } from '@/hooks/support/useToast';
 import { useUserStore } from '@/store/support/useUserStore';
 
 const CommentCard = ({ reply }: { reply: ReplyType }) => {
-  console.log('reply', reply);
+  console.log('reply', reply.content, reply.isUpvote);
   return (
     <Box w={'100%'}>
-      <ReplyCard {...reply} />
+      <ReplyCard key={reply.id} {...reply} />
       <Box ml={'40px'}>
         {reply.children.map((item) => (
           <ReplyCard key={item.id} {...item} />
@@ -74,7 +74,7 @@ const ReplyCard = ({
 
   const { run: handleUpvote } = useRequest2(
     () => {
-      return isUpvoted ? downvoteReply({ replyId: id }) : upvoteReply({ replyId: id });
+      return isUpvoted ? downvoteReply({ id }) : upvoteReply({ id });
     },
     {
       onSuccess: () => {
@@ -82,6 +82,7 @@ const ReplyCard = ({
         setReplyDataList((pre) => {
           return pre.map((item) => {
             console.log('item', item);
+            console.log('id', id);
             if (item.id === id) {
               return {
                 ...item,

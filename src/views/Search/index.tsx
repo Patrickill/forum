@@ -38,7 +38,6 @@ const Search = () => {
         display={'flex'}
         w={'100%'}
         h={'calc(100% - 60px)'}
-        justifyContent={'center'}
         alignContent={'center'}
         flexDir={'column'}
         gap={8}
@@ -49,7 +48,7 @@ const Search = () => {
         boxShadow={'md'}
         ScrollContainerRef={ScrollContainerRef}
       >
-        <Box w={'60%'}>
+        <Box p={4}>
           {postList?.map((item) => (
             <PostCard key={item.id} {...item} createdOn={item.createdOn || item.modifiedOn!} />
           ))}

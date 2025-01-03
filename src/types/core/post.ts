@@ -8,7 +8,7 @@ export interface PostLink {
   type: number;
 }
 export interface postDetailType {
-  collectionCount: number;
+  collectCount: number;
   replyCount: number;
   content: string;
   createdOn: string;
@@ -35,16 +35,16 @@ export interface Link {
 export interface createPostType {
   categoryId: number;
   content: string;
-  ip: string;
-  ipLoc: string;
+  ip?: string;
+  ipLoc?: string;
   link: Link[];
-  tags: number[];
+  tagIds: number[];
   title: string;
   visibility: number;
 }
 
 export interface postListType {
-  collectionCount: number;
+  collectCount: number;
   replyCount: number;
   content: string;
   createdOn: string;
@@ -66,5 +66,5 @@ export interface postListType {
 
 export interface TagType {
   id: number;
-  tag: string;
+  name: string;
 }

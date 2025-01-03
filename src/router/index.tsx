@@ -1,8 +1,7 @@
 import { RouteObject, useRoutes } from 'react-router-dom';
 import Home from '@/views/Home';
 import Login from '@/views/Login';
-import Setting from '@/views/Setting';
-import Alerts from '@/views/Alerts';
+
 import Me from '@/views/Me';
 import Editor from '@/views/Edit';
 import Post from '@/views/Post';
@@ -27,16 +26,6 @@ export const constantRoutes: RouteObject[] = [
     path: '/login',
     id: 'Login',
     element: <Login />,
-  },
-  {
-    path: '/setting',
-    id: 'Setting',
-    element: <Setting />,
-  },
-  {
-    path: '/alerts',
-    id: 'Alerts',
-    element: <Alerts />,
   },
   {
     path: '/me',

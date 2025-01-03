@@ -16,7 +16,7 @@ const PostCard = ({
   ipLoc,
   title,
   upvoteCount,
-  collectionCount,
+  collectCount,
   replyCount,
   viewCount,
   user,

@@ -12,6 +12,7 @@ const Comment = () => {
   const TextareaDom = useRef<HTMLTextAreaElement>(null);
   const context = useContext(CommentContext);
   const replyList = context.replyList;
+  console.log('replyList', replyList);
   const { userInfo } = useUserStore();
   const [inputValue, setValue] = useState<string>();
   const textareaMinH = '22px';

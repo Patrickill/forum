@@ -1,4 +1,5 @@
 import { getPostByTag } from '@/api/core/post';
+import { getTagById } from '@/api/core/tag';
 import EmptyTip from '@/components/common/EmptyTip';
 import Header from '@/components/common/Layout/Header';
 import MyDivider from '@/components/common/MyDivider';
@@ -20,19 +21,24 @@ enum TabEnum {
 
 const Tag = () => {
   const { getQueryParam } = useRoute();
-
+  const tagId = getQueryParam('tagId');
   const ScrollContainerRef = useRef<HTMLDivElement>(null);
+
+  const { data: tag } = useRequest2(getTagById, {
+    defaultParams: [{ id: tagId || '0' }],
+    manual: false,
+  });
 
   const {
     data: postList,
     isLoading,
     setData: setPostList,
-
+    total,
     ScrollData,
   } = usePagination<postListType>({
     api: getPostByTag,
     params: {
-      tagId: getQueryParam('tagId'),
+      tagId,
     },
     pageSize: 10,
     defaultRequest: true,
@@ -45,7 +51,7 @@ const Tag = () => {
       <Flex mt={'60px'} w={'100%'} h={'100%'} overflow={'auto'} p={10} gap={6}>
         <Box flex={5}>
           <Box fontSize={'2xl'} fontWeight={'bold'} color={'myGray.900'}>
-            {'标题'}
+            {tag?.name}
           </Box>
           {/* <Box fontSize={'sm'} mt={4}>
             {'描述描述描述描述描述描述描述描述描述描述描述描述'}
@@ -55,7 +61,7 @@ const Tag = () => {
               {'帖子'}
             </Box>
             <Box ml={2} fontSize={'sm'} color={'myGray.900'} fontWeight={'bold'}>
-              {'45092'}
+              {total}
             </Box>
           </Flex>
           <MyDivider />

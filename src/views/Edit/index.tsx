@@ -26,6 +26,8 @@ import { usePostStore } from '@/store/core/usePostStore';
 import { getNanoid } from '@/utils/support/tools';
 import { addTag, getTagList } from '@/api/core/tag';
 import { createPost } from '@/api/core/post';
+import { usePagination } from '@/hooks/support/usePagination';
+import { TopicType } from '@/types/core/topic';
 
 const Editor = () => {
   const {
@@ -39,14 +41,14 @@ const Editor = () => {
     defaultValues: {
       visibility: 4,
       link: [],
-      tags: [],
+      tagIds: [],
     },
   });
 
-  const [categoryId, content, tags, visibility, link] = watch([
+  const [categoryId, content, tagIds, visibility, link] = watch([
     'categoryId',
     'content',
-    'tags',
+    'tagIds',
     'visibility',
     'link',
   ]);
@@ -83,9 +85,12 @@ const Editor = () => {
     [toast, content, setValue]
   );
 
-  const { data: topicList } = useRequest2(getTopicList, {
-    manual: false,
+  const { data: topicList } = usePagination<TopicType>({
+    api: getTopicList,
+    pageSize: 10,
+    defaultRequest: true,
   });
+
   const visibilityOptions = [
     { value: 1, label: '私密' },
     { value: 2, label: '关注可见' },
@@ -221,9 +226,9 @@ const Editor = () => {
         <FormControl>
           <FormLabel label={'标签'} />
           <MultipleSelect<number>
-            list={tagList?.map((item, index) => ({ label: item.tag, value: item.id })) || []}
-            value={tags as any}
-            onSelect={(val) => setValue('tags', val)}
+            list={tagList?.map((item, index) => ({ label: item.name, value: item.id })) || []}
+            value={tagIds as any}
+            onSelect={(val) => setValue('tagIds', val)}
             header={RenderTagHeader()}
             loading={tagListLoading}
           />

@@ -7,3 +7,5 @@ export const getUserByIdArr = (data: { userIds: number[] }) =>
 export const getUserInfo = () => GET<UserType>('/api/user/info');
 
 export const updateUserInfo = (data: User) => PUT('/api/user/info', data);
+
+export const getUserInfoById = ({ id }: { id: number }) => GET<UserType>(`/api/user/id/${id}`);

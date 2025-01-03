@@ -19,6 +19,7 @@ import HotPostList from '@/components/core/post/HotPostList';
 import { getTopicList } from '@/api/core/topic';
 import MyIcon from '@/components/common/MyIcon';
 import SearchInput from '@/components/core/post/SearchInput';
+import { TopicType } from '@/types/core/topic';
 enum TabEnum {
   hot = 'hot',
   new = 'new',
@@ -32,15 +33,10 @@ const Home = () => {
 
   const [currentTopic, setCurrentTopic] = useState(1);
 
-  const {
-    data: topicList,
-    loading,
-    mutate,
-  } = useRequest2(getTopicList, {
-    manual: false,
-    onSuccess: (res) => {
-      setCurrentTopic(res.list[0]?.id);
-    },
+  const { data: topicList } = usePagination<TopicType>({
+    api: getTopicList,
+    pageSize: 10,
+    defaultRequest: true,
   });
 
   const {
@@ -63,11 +59,7 @@ const Home = () => {
       <Flex w={'100%'} h={'100%'} p={6} ref={ScrollContainerRef} overflow={'overlay'} gap={6}>
         <Box flex={5}>
           <Flex justify={'space-between'} w={'100%'} p={1}>
-            <TopicTab
-              topicList={topicList?.list || []}
-              value={currentTopic}
-              setValue={setCurrentTopic}
-            />
+            <TopicTab topicList={topicList || []} value={currentTopic} setValue={setCurrentTopic} />
             <SearchInput />
           </Flex>
           <Box>

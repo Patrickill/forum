@@ -3,11 +3,11 @@ import MyIcon from '@/components/common/MyIcon';
 import Tag from '@/components/common/Tag';
 import { useRequest2 } from '@/hooks/core/useRequest';
 import { Box, BoxProps, Flex } from '@chakra-ui/react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 const SliderList = ({
   replyCount,
-  collectionCount,
+  collectCount,
   upvoteCount,
   isCollect,
   isUpvote,
@@ -17,7 +17,7 @@ const SliderList = ({
   ...props
 }: BoxProps & {
   replyCount: number;
-  collectionCount: number;
+  collectCount: number;
   upvoteCount: number;
   isUpvote: boolean;
   isCollect: boolean;
@@ -27,11 +27,10 @@ const SliderList = ({
 }) => {
   const [collected, setCollected] = useState(isCollect);
   const [upvoted, setUpvoted] = useState(isUpvote);
-
   const { run: handleUpvote } = useRequest2(
     () => {
       console.log('isUpvote', isUpvote);
-      return upvoted ? CancelStarPost({ postId }) : starPost({ postId });
+      return upvoted ? CancelStarPost({ id: postId }) : starPost({ id: postId });
     },
     {
       manual: true,
@@ -44,7 +43,7 @@ const SliderList = ({
 
   const { run: handleCollect } = useRequest2(
     () => {
-      return collected ? CancelCollectPost({ postId }) : collectPost({ postId });
+      return collected ? CancelCollectPost({ id: postId }) : collectPost({ id: postId });
     },
     {
       manual: true,
@@ -54,6 +53,11 @@ const SliderList = ({
       },
     }
   );
+
+  useEffect(() => {
+    setCollected(isCollect);
+    setUpvoted(isUpvote);
+  }, [isCollect, isUpvote]);
 
   return (
     <Flex gap={10} flexDir={'column'} {...props}>
@@ -102,7 +106,7 @@ const SliderList = ({
           />
         </Flex>
         <Tag color={'myGray.500'} pos={'absolute'} top={-1} right={-3}>
-          {collectionCount}
+          {collectCount}
         </Tag>
       </Flex>
       <Flex
