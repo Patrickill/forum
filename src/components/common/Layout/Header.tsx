@@ -1,10 +1,13 @@
 import SearchInput from '@/components/core/post/SearchInput';
 import useRoute from '@/hooks/support/useRouter';
+import { useUserStore } from '@/store/support/useUserStore';
 import { Avatar, Box, Flex } from '@chakra-ui/react';
 import { useEffect, useState } from 'react';
 
 const Header = ({ isVisible = true }: { isVisible?: boolean }) => {
   const { push } = useRoute();
+
+  const { userInfo } = useUserStore();
 
   return (
     <Flex
@@ -50,7 +53,7 @@ const Header = ({ isVisible = true }: { isVisible?: boolean }) => {
             borderRadius={'50%'}
             w={'36px'}
             h={'36px'}
-            src={'/logo.svg'}
+            src={userInfo?.avatar}
             onClick={() => push('/me')}
           />
         </Box>

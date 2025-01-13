@@ -10,7 +10,7 @@ import { useCallback, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import UpdatePswModal from './components/UpdatePswModal';
 import LightRowTabs from '@/components/common/Tabs/LightRowTabs';
-import { useRequest2 } from '@/hooks/core/useRequest';
+import { useRequest, useRequest2 } from '@/hooks/core/useRequest';
 import { getUserInfoById, updateUserInfo } from '@/api/support/user';
 import { usePagination } from '@/hooks/support/usePagination';
 import { delPost, getCollectPostList, getMyPostList, getStaredPostList } from '@/api/core/post';
@@ -18,6 +18,8 @@ import EmptyTip from '@/components/common/EmptyTip';
 import PostCard from '@/components/core/post/PostCard';
 import Loading from '@/components/common/MyLoading';
 import useRoute from '@/hooks/support/useRouter';
+import { getAIAvatar } from '@/api/support/avatar';
+import base64ToFile from '@/utils/base64ToFile';
 
 enum TabEnum {
   like = 'like',
@@ -52,13 +54,23 @@ const Me = () => {
     color: 'myGray.900',
   };
 
+  const { data: userInfoData } = useRequest2(
+    () => {
+      if (!userId) return Promise.reject();
+      return getUserInfoById({ id: Number(userId) });
+    },
+    {
+      manual: false,
+    }
+  );
+
   const { reset, watch } = useForm<UserUpdateParams>({
-    defaultValues: userInfo as UserType,
+    defaultValues: userId ? userInfoData : (userInfo as UserType),
   });
 
   const avatar = watch('avatar');
 
-  const { File, onOpen: onOpenSelectFile } = useSelectFile({
+  const { File: FileTSX, onOpen: onOpenSelectFile } = useSelectFile({
     fileType: '.jpg,.png',
     multiple: false,
   });
@@ -81,11 +93,12 @@ const Me = () => {
   const onSelectFile = useCallback(
     async (e: File[]) => {
       const file = e[0];
-      console.log('file', file);
+
       if (!file || !userInfo) return;
       try {
         const formData = new FormData();
         formData.append('file', file);
+        console.log('file', file);
         const { fileUrl: src } = await uploadFile(formData);
 
         onclickSave({
@@ -126,21 +139,45 @@ const Me = () => {
     refreshDeps: [currentTab],
   });
 
-  const { data: userInfoData } = useRequest2(
-    () => {
-      if (!userId) return Promise.reject();
-      return getUserInfoById({ id: Number(userId) });
-    },
-    {
-      manual: false,
-    }
-  );
+  const [baseString, setBaseString] = useState('');
 
+  const generateAiAvatar = useCallback(async () => {
+    try {
+      const base64Data = await getAIAvatar();
+      setBaseString(base64Data);
+
+      const form = new FormData();
+      const file = base64ToFile(base64Data, 'avatar.png');
+      console.log('ai file', file);
+      form.append('file', file); // 添加 Blob 到 FormData
+
+      const { fileUrl: src } = await uploadFile(form);
+
+      onclickSave({ ...userInfo!, avatar: src });
+      setUserInfo({
+        ...userInfo!,
+        avatar: src,
+      });
+    } catch (err) {
+      toast({
+        title: typeof err === 'string' ? err : '上传失败',
+        status: 'warning',
+      });
+    }
+  }, [onclickSave, userInfo]);
+  console.log(baseString, 'baseString');
   return (
     <PageContainer>
       {/* <Box className="textEllipsis" w={'200px'}> */}
       <Box p={10}>
-        <Flex h={'200px'} w={'100%'} bg={'myGray.100'} align={'center'} borderRadius={'xl'}>
+        <Flex
+          h={'200px'}
+          w={'100%'}
+          bg={'myGray.100'}
+          align={'center'}
+          borderRadius={'xl'}
+          justify={'space-between'}
+        >
           <Flex align={'center'}>
             <Flex alignItems={'center'} cursor={userId ? 'default' : 'pointer'} p={10}>
               <MyTooltip label={userId ? '' : '点击修改头像'}>
@@ -170,7 +207,7 @@ const Me = () => {
                 <Input
                   flex={'1 0 0'}
                   fontSize={'2xl'}
-                  defaultValue={userInfoData?.nickname || userInfo?.nickname}
+                  defaultValue={userId ? userInfoData?.nickname : userInfo?.nickname}
                   title={'点击修改昵称'}
                   borderColor={'transparent'}
                   transform={'translateX(-11px)'}
@@ -204,6 +241,9 @@ const Me = () => {
               )}
             </Flex>
           </Flex>
+          <Flex p={10}>
+            <Button onClick={generateAiAvatar}>{'生成动漫头像'}</Button>
+          </Flex>
         </Flex>
 
         <Box mt={5}>
@@ -232,14 +272,14 @@ const Me = () => {
             width={'200px'}
           />
           <ScrollData ScrollContainerRef={ScrollContainerRef} mt={5}>
-            {isLoading && <Loading />}
+            {/* {isLoading && <Loading />} */}
             {!isLoading && data.length === 0 && <EmptyTip text={'暂无记录~'} />}
             {data.map((item) => item.id && <PostCard key={item.id} {...item} setData={setData} />)}
           </ScrollData>
         </Box>
 
         {isOpenUpdatePsw && <UpdatePswModal onClose={onCloseUpdatePsw} />}
-        <File onSelect={onSelectFile} />
+        <FileTSX onSelect={onSelectFile} />
       </Box>
     </PageContainer>
   );

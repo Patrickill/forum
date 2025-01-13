@@ -10,7 +10,7 @@ import {
   useDisclosure,
 } from '@chakra-ui/react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import Message from '@/views/Message';
+
 import {
   IoMailOutline,
   IoHomeOutline,
@@ -141,8 +141,6 @@ const Navbar = () => {
           ))}
         </Box>
       </Flex>
-      isOpen && (
-      <Message isOpen={isOpen} onClose={onClose} title={'消息'} />)
     </>
   );
 };
