@@ -9,7 +9,7 @@ const instance = axios.create({
   },
 });
 
-export const getAIAvatar = async (): Promise<string> => {
+export const getAIAvatar = async ({ value }: { value: string }): Promise<string> => {
   try {
     const { data } = (await instance.post('/ai/train-image')) as any;
 

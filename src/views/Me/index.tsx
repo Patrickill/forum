@@ -5,7 +5,17 @@ import { useSelectFile } from '@/hooks/common/useSelectFile';
 import { useToast } from '@/hooks/support/useToast';
 import { useUserStore } from '@/store/support/useUserStore';
 import { UserType } from '@/types/support/user';
-import { Avatar, Box, BoxProps, Button, Flex, Input, useDisclosure } from '@chakra-ui/react';
+import {
+  Avatar,
+  Box,
+  BoxProps,
+  Button,
+  Checkbox,
+  Flex,
+  Input,
+  Stack,
+  useDisclosure,
+} from '@chakra-ui/react';
 import { useCallback, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import UpdatePswModal from './components/UpdatePswModal';
@@ -141,9 +151,44 @@ const Me = () => {
 
   const [baseString, setBaseString] = useState('');
 
+  const [avatarOptionData, setAvatarOptionData] = useState<any>([
+    { id: 1, label: '男', checked: false },
+    { id: 2, label: '女', checked: false },
+    { id: 3, label: '短发', checked: false },
+    { id: 4, label: '长发', checked: false },
+    { id: 5, label: '黑发', checked: false },
+    { id: 6, label: '白发', checked: false },
+    { id: 7, label: '蓝发', checked: false },
+    { id: 8, label: '红发', checked: false },
+    { id: 9, label: '微笑', checked: false },
+    { id: 10, label: '生气', checked: false },
+  ]);
+
+  const handleAvatarOptionChange = useCallback(
+    (id: number) => {
+      const newAvatarOptionData = avatarOptionData.map((item: any) => {
+        if (item.id === id) {
+          return { ...item, checked: !item.checked };
+        }
+        return item;
+      });
+
+      setAvatarOptionData(newAvatarOptionData);
+
+      console.log('new', avatarOptionData);
+    },
+    [avatarOptionData]
+  );
+
   const generateAiAvatar = useCallback(async () => {
     try {
-      const base64Data = await getAIAvatar();
+      console.log(
+        'string',
+        avatarOptionData.map((item: any) => (item.checked ? '1' : '0')).join('')
+      );
+      const base64Data = await getAIAvatar(
+        avatarOptionData.map((item: any) => (item.checked ? '1' : '0')).join('')
+      );
       setBaseString(base64Data);
 
       const form = new FormData();
@@ -164,7 +209,7 @@ const Me = () => {
         status: 'warning',
       });
     }
-  }, [onclickSave, userInfo]);
+  }, [onclickSave, userInfo, avatarOptionData]);
   console.log(baseString, 'baseString');
   return (
     <PageContainer>
@@ -241,8 +286,21 @@ const Me = () => {
               )}
             </Flex>
           </Flex>
-          <Flex p={10}>
-            <Button onClick={generateAiAvatar}>{'生成动漫头像'}</Button>
+          <Flex p={10} flexDir={'column'} alignItems={'center'} gap={4}>
+            <Button w={'100px'} onClick={generateAiAvatar}>
+              {'生成动漫头像'}
+            </Button>
+            <Stack direction={'row'} spacing={4} ml={4}>
+              {avatarOptionData.map((item: any) => (
+                <Checkbox
+                  key={item.id}
+                  onChange={() => handleAvatarOptionChange(item.id)}
+                  isChecked={item.checked}
+                >
+                  {item.label}
+                </Checkbox>
+              ))}
+            </Stack>
           </Flex>
         </Flex>
 
@@ -271,11 +329,11 @@ const Me = () => {
             px={4}
             width={'200px'}
           />
-          <ScrollData ScrollContainerRef={ScrollContainerRef} mt={5}>
-            {/* {isLoading && <Loading />} */}
+          {/* <ScrollData ScrollContainerRef={ScrollContainerRef} mt={5}>
+
             {!isLoading && data.length === 0 && <EmptyTip text={'暂无记录~'} />}
             {data.map((item) => item.id && <PostCard key={item.id} {...item} setData={setData} />)}
-          </ScrollData>
+          </ScrollData> */}
         </Box>
 
         {isOpenUpdatePsw && <UpdatePswModal onClose={onCloseUpdatePsw} />}
