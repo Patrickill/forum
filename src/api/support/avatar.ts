@@ -11,7 +11,8 @@ const instance = axios.create({
 
 export const getAIAvatar = async ({ value }: { value: string }): Promise<string> => {
   try {
-    const { data } = (await instance.post('/ai/train-image')) as any;
+    console.log('value', value);
+    const { data } = (await instance.post('/ai/train-image', { value })) as any;
 
     if (data.status !== 'success') {
       throw new Error('Training failed');

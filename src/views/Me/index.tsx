@@ -186,9 +186,9 @@ const Me = () => {
         'string',
         avatarOptionData.map((item: any) => (item.checked ? '1' : '0')).join('')
       );
-      const base64Data = await getAIAvatar(
-        avatarOptionData.map((item: any) => (item.checked ? '1' : '0')).join('')
-      );
+      const base64Data = await getAIAvatar({
+        value: avatarOptionData.map((item: any) => (item.checked ? '1' : '0')).join(''),
+      });
       setBaseString(base64Data);
 
       const form = new FormData();
