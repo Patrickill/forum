@@ -50,7 +50,7 @@ const Me = () => {
   const { getQueryParam } = useRoute();
 
   const userId = getQueryParam('id');
-
+  const [avatarBase64, setAvatarBase64] = useState<string | undefined>(undefined);
   const [currentTab, setCurrentTab] = useState(TabEnum.my);
 
   const avatarRef = useRef<HTMLImageElement>(null);
@@ -187,7 +187,8 @@ const Me = () => {
       });
       console.log('ref', avatarRef.current);
       console.log('base64Data', base64Data);
-      avatarRef.current!.src = 'data:image/png;base64,' + base64Data;
+
+      setBaseString('data:image/png;base64,' + base64Data);
 
       // setBaseString(base64Data);
       // const form = new FormData();
@@ -237,7 +238,7 @@ const Me = () => {
                   }}
                 >
                   <Avatar
-                    src={userInfoData?.avatar || avatar}
+                    src={avatarBase64}
                     ref={avatarRef}
                     borderRadius={'50%'}
                     w={'100%'}
