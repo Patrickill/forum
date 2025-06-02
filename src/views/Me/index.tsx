@@ -53,6 +53,8 @@ const Me = () => {
 
   const [currentTab, setCurrentTab] = useState(TabEnum.my);
 
+  const avatarRef = useRef<HTMLImageElement>(null);
+
   const {
     isOpen: isOpenUpdatePsw,
     onClose: onCloseUpdatePsw,
@@ -174,35 +176,32 @@ const Me = () => {
       });
 
       setAvatarOptionData(newAvatarOptionData);
-
-      console.log('new', avatarOptionData);
     },
     [avatarOptionData]
   );
 
   const generateAiAvatar = useCallback(async () => {
     try {
-      console.log(
-        'string',
-        avatarOptionData.map((item: any) => (item.checked ? '1' : '0')).join('')
-      );
       const base64Data = await getAIAvatar({
         value: avatarOptionData.map((item: any) => (item.checked ? '1' : '0')).join(''),
       });
-      setBaseString(base64Data);
+      console.log('ref', avatarRef.current);
+      console.log('base64Data', base64Data);
+      avatarRef.current!.src = 'data:image/png;base64,' + base64Data;
 
-      const form = new FormData();
-      const file = base64ToFile(base64Data, 'avatar.png');
-      console.log('ai file', file);
-      form.append('file', file); // 添加 Blob 到 FormData
+      // setBaseString(base64Data);
+      // const form = new FormData();
+      // const file = base64ToFile(base64Data, 'avatar.png');
+      // console.log('ai file', file);
+      // form.append('file', file); // 添加 Blob 到 FormData
 
-      const { fileUrl: src } = await uploadFile(form);
+      // const { fileUrl: src } = await uploadFile(form);
 
-      onclickSave({ ...userInfo!, avatar: src });
-      setUserInfo({
-        ...userInfo!,
-        avatar: src,
-      });
+      // onclickSave({ ...userInfo!, avatar: src });
+      // setUserInfo({
+      //   ...userInfo!,
+      //   avatar: src,
+      // });
     } catch (err) {
       toast({
         title: typeof err === 'string' ? err : '上传失败',
@@ -239,6 +238,7 @@ const Me = () => {
                 >
                   <Avatar
                     src={userInfoData?.avatar || avatar}
+                    ref={avatarRef}
                     borderRadius={'50%'}
                     w={'100%'}
                     h={'100%'}
